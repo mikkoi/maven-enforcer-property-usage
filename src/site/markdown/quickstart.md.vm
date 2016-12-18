@@ -1,15 +1,8 @@
-# maven-enforcer-property-usage
+Quickstart Guide
+================
 
-Maven Enforcer Plugin (org.apache.maven.plugins:maven-enforcer-plugin) rule:
-Ensure that all the Java properties defined in resources .properties files
-are also used in code.
-
----
-
-* [Project Website](http://mikkoi.github.io/maven-enforcer-property-usage/)
-* [SonarQube Reports](https://sonarqube.com/dashboard/index/com.github.mikkoi.maven.enforcer.rule:property-usage-rule)
-
-## Quickstart
+Configuring the plugin
+----------------------
 
 Add the following to your project's `pom.xml` file:
 
@@ -61,3 +54,4 @@ Add the following to your project's `pom.xml` file:
         </executions>
     </plugin>
 
+To know more about plugin's configuration and parameters check the [mojo page](usage.html).
