@@ -3,19 +3,60 @@ Configuration
 
 Enforcer rule `${project.artifactId}` has the following configuration parameters:
 
-* `<requireEncoding>`
+* `<definedPropertiesAreUsed>`
 
-Validate files against this encoding, e.g. `UTF-8`.
+If this value is set, defined properties must all be used in the files in `<usage>` element.
 
-* `<directory>`
+Default value is true.
 
-Which dir to scan, often `src`.
+* `<definedPropertiesAreUsed>`
 
-* `<excludeRegex>`
+If this value is set, all the properties used in the files in `<usage>` element are also defined.
 
-Exclude files with names matching regex below, e.g. `^.*\.(gif|jpg|png)$`.
+Default value is true.
 
-* `<includeRegex>`
+* `<definitionsOnlyOnce>`
 
-Include files with names matching regex below, e.g. `^.*\.java$`.
+If this value is set, check that no property is defined more than once.
+
+Default value is true.
+
+* `<definitions>`
+
+The used properties to search for in the files.
+This is a list of `<file>` elements inside element `<files>` to
+read the `.properties` files. `<file>` is a file name, wildcards not supported.
+
+Default value for `<definitions>` is:
+
+    <files>
+        <file>${project.basedir}/src/main/resources/[[:print:]]+\.properties</file>
+    </file>
+
+
+* `<templates>`
+
+`<templates>` contains a list of `<template>` items. Template is
+a regular expression which we look for in the source files. It is used
+to make a better match with the property name. If, for example,
+you want to make sure properties are always accessed via an interface,
+you can specify a template for that here. The regular expression can contain
+one group. It is the property name.
+
+Example shows the Spring Framework annotation with default value set:
+
+    <template>@Value\("\$\{([[:print:]]+):[[:print:]]+\}"\)</template>
+
+The default template is the property name exactly as it, with only quotation marks around it.
+
+    <template>"([[:print:]]+)"</template>
+
+* `<usages>`
+
+Only look in files in `<file>` elements. Wildcards not supported.
+If `<file>` is a directory, check recursively all files.
+
+Default value:
+
+    <file>${project.basedir}/src/main/java</file>
 

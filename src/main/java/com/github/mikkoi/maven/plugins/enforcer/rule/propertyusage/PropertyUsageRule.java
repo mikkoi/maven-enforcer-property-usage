@@ -19,7 +19,9 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
  * under the License.
  */
 
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.*;
 import com.google.common.io.ByteStreams;
+import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
@@ -31,30 +33,21 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
+
 /**
- * Checks for usage of properties mentioned in .properties files.
+ * Verifies for usage of properties mentioned in .properties files.
  */
 @SuppressWarnings("WeakerAccess")
 public final class PropertyUsageRule implements EnforcerRule {
 
+    Log log = null;
     @Nonnull
     private static final String INCLUDE_REGEX_DEFAULT = ".*";
     @Nonnull
@@ -62,6 +55,37 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     private static final String DIRECTORY_DEFAULT = "src";
 
+    /**
+     * Definitions
+     */
+    @Nonnull
+    private Collection<Collection<FileSpec>> definitions = Definitions.DEFAULT;
+
+    /**
+     * Templates
+     */
+    @Nonnull
+    private Collection<Template> templates = Templates.DEFAULT;
+
+    /**
+     * Usages
+     */
+    @Nonnull
+    private Collection<Collection<FileSpec>> usages = Usages.DEFAULT;
+
+    /**
+     * Properties which were not found in usages.
+     */
+    @Nonnull
+    private final Set<String> propertiesNotUsed = Collections.emptySet();
+
+    /**
+     * Properties which were used in usages but not defined in definitions.
+     */
+    @Nonnull
+    private final Set<String> propertiesNotDefined = Collections.emptySet();
+
+    ///////////////
     /**
      * Faulty files list. Can be accessed after processing execute().
      */
@@ -104,9 +128,10 @@ public final class PropertyUsageRule implements EnforcerRule {
      * @param helper EnforcerRuleHelper
      * @throws EnforcerRuleException Throws when error
      */
+    @Override
     public void execute(@Nonnull final EnforcerRuleHelper helper)
             throws EnforcerRuleException {
-        Log log = helper.getLog();
+        log = helper.getLog();
 
         try {
             // get the various expressions out of the helper.
@@ -115,43 +140,11 @@ public final class PropertyUsageRule implements EnforcerRule {
             log.debug("Retrieved Basedir: " + basedir);
             log.debug("requireEncoding: " + (requireEncoding == null ? "null" : requireEncoding));
             log.debug("directory: " + (directory == null ? "null" : directory));
-            log.debug("includeRegex: " + (includeRegex == null ? "null" : includeRegex));
-            log.debug("excludeRegex: " + (excludeRegex == null ? "null" : excludeRegex));
 
-            if (this.getRequireEncoding() == null || this.getRequireEncoding().trim().length() == 0) {
-                final String sourceEncoding = (String) helper.evaluate("${project.build.sourceEncoding}");
-                log.info("No parameter 'requiredEncoding' set. Defaults to property 'project.build.sourceEncoding'.");
-                if (sourceEncoding != null && sourceEncoding.trim().length() > 0) {
-                    this.setRequireEncoding(sourceEncoding);
-                } else {
-                    throw new EnforcerRuleException("Missing parameter 'requireEncoding' and property 'project.build.sourceEncoding'.");
-                }
-            }
-            try {
-                Charset.forName(this.getRequireEncoding()); //  Charset names are not case-sensitive
-            } catch (IllegalCharsetNameException e) {
-                throw new EnforcerRuleException("Illegal value (illegal character set name) '" + requireEncoding + "' for parameter 'requireEncoding'.");
-            } catch (UnsupportedCharsetException e) {
-                throw new EnforcerRuleException("Illegal value (not supported character set) '" + requireEncoding + "' for parameter 'requireEncoding'.");
-            } catch (IllegalArgumentException e) {
-                throw new EnforcerRuleException("Illegal value (empty) '" + requireEncoding + "' for parameter 'requireEncoding'.");
-            }
-            if (this.getDirectory() == null || this.getDirectory().trim().length() == 0) {
-                log.info("No parameter 'directory' set. Defaults to '" + DIRECTORY_DEFAULT + "'.");
-                this.setDirectory(DIRECTORY_DEFAULT);
-            }
-            if (this.getIncludeRegex() == null || this.getIncludeRegex().trim().length() == 0) {
-                log.info("No parameter 'includeRegex' set. Defaults to '" + INCLUDE_REGEX_DEFAULT + "'.");
-                this.setIncludeRegex(INCLUDE_REGEX_DEFAULT);
-            }
-            if (this.getExcludeRegex() == null || this.getExcludeRegex().trim().length() == 0) {
-                log.info("No parameter 'excludeRegex' set. Defaults to '" + EXCLUDE_REGEX_DEFAULT + "'.");
-                this.setExcludeRegex(EXCLUDE_REGEX_DEFAULT);
-            }
-            log.debug("requireEncoding: " + this.getRequireEncoding());
-            log.debug("directory: " + this.getDirectory());
-            log.debug("includeRegex: " + this.getIncludeRegex());
-            log.debug("excludeRegex: " + this.getExcludeRegex());
+//            log.debug("requireEncoding: " + this.getRequireEncoding());
+//            log.debug("directory: " + this.getDirectory());
+//            log.debug("includeRegex: " + this.getIncludeRegex());
+//            log.debug("excludeRegex: " + this.getExcludeRegex());
 
             // Check the existence of the wanted directory:
             final Path dir = Paths.get(basedir, getDirectory());
@@ -248,6 +241,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      *
      * @return Always false here.
      */
+    @Override
     @Nullable
     public String getCacheId() {
         return String.valueOf(false);
@@ -261,6 +255,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      *
      * @return Always false here.
      */
+    @Override
     public boolean isCacheable() {
         return false;
     }
@@ -275,6 +270,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      * @param arg0 EnforcerRule
      * @return Always false here.
      */
+    @Override
     public boolean isResultValid(@Nullable final EnforcerRule arg0) {
         return false;
     }
@@ -325,6 +321,54 @@ public final class PropertyUsageRule implements EnforcerRule {
     @SuppressWarnings("WeakerAccess")
     public void setRequireEncoding(@Nullable final String requireEncoding) {
         this.requireEncoding = requireEncoding;
+    }
+
+    @Nonnull
+    public Set<String> getPropertiesNotUsed() {
+        return propertiesNotUsed;
+    }
+
+    @Nonnull
+    public Set<String> getPropertiesNotDefined() {
+        return propertiesNotDefined;
+    }
+
+    public void setDefinitions(@Nonnull final Collection<Collection<FileSpec>> definitions) {
+        this.definitions = definitions;
+    }
+
+    public void setTemplates(@Nonnull final Collection<Template> templates) {
+        this.templates = templates;
+    }
+
+    public void setUsages(@Nonnull Collection<Collection<FileSpec>> usages) {
+        this.usages = usages;
+    }
+
+    /**
+     * @param fileSpecs Collection of file specs to read properties from.
+     * @return Map of definitions and how many times they are defined.
+     */
+    @Nonnull
+    public static Map<String, Integer> readPropertiesFromFiles(@Nonnull final Collection<FileSpec> fileSpecs)
+            throws IOException {
+        Map<String, Integer> results = new HashMap<>();
+        for (FileSpec fileSpec : fileSpecs) {
+            File file = new File(fileSpec.getFile());
+            Properties properties = new Properties();
+            try (InputStream inputStream = new FileInputStream(file)) {
+                properties.load(inputStream);
+                Set<String> names = properties.stringPropertyNames();
+                for (String name : names) {
+                    if (!results.containsKey(name)) {
+                        results.put(name, 0);
+                    } else {
+                        results.replace(name, results.get(name) + 1);
+                    }
+                }
+            }
+        }
+        return results;
     }
 
     /**
@@ -378,14 +422,14 @@ public final class PropertyUsageRule implements EnforcerRule {
         ) throws IOException {
             log.debug("Visiting file '" + aFile.toString() + "'.");
             if (includeRegexUsed && !includeRegexPattern.matcher(aFile.toString()).find()) {
-                log.debug("File not matches includeRegex in-filter. Exclude file from list!");
+                log.debug("FileSpec not matches includeRegex in-filter. Exclude file from list!");
                 return FileVisitResult.CONTINUE;
             }
             if (excludeRegexUsed && excludeRegexPattern.matcher(aFile.toString()).find()) {
-                log.debug("File matches excludeRegex out-filter. Exclude file from list!");
+                log.debug("FileSpec matches excludeRegex out-filter. Exclude file from list!");
                 return FileVisitResult.CONTINUE;
             }
-            log.debug("File matches includeRegex in-filter and not matches excludeRegex out-filter. Include file to list!");
+            log.debug("FileSpec matches includeRegex in-filter and not matches excludeRegex out-filter. Include file to list!");
             File file = aFile.toFile();
             FileResult res = new FileResult.Builder(aFile.toAbsolutePath())
                     .lastModified(file.lastModified())

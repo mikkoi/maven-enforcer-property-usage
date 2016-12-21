@@ -24,7 +24,8 @@ Add the following to your project's `pom.xml` file:
                 <configuration>
                     <rules>
                         <useAllProperties implementation="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule">
-                            <properties>
+                            <definedPropertiesAreUsed/>
+                            <definition>
                                 <!-- The files from which to read the used properties. -->
                                 <!-- default: src/main/resources/*.properties -->
                                 <!-- File is always used as a regular expression. -->
@@ -32,7 +33,7 @@ Add the following to your project's `pom.xml` file:
                                 <files>
                                     <file></file>
                                 </file>
-                            </properties>
+                            </definition>
                             <templates>
                                 <!-- The usage templates. -->
                                 <!-- default: property name as it is in *.properties files -->
