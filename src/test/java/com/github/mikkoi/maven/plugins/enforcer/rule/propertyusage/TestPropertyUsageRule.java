@@ -1,21 +1,15 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpec;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Template;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugins.enforcer.EnforcerTestUtils;
-import org.junit.Test;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -100,9 +94,9 @@ public final class TestPropertyUsageRule {
             boolean expected,
             @Nonnull final Set<String> propertiesNotUsed, // There names were never used.
             @Nonnull final Set<String> propertiesNotDefined, // There names were not defined.
-            @Nullable final Collection<Collection<FileSpec>> definitions,
+            @Nullable final Collection<Collection<String>> definitions,
             @Nullable final Collection<Template> templates,
-            @Nullable final Collection<Collection<FileSpec>> usages
+            @Nullable final Collection<Collection<String>> usages
     ) {
         boolean isValid;
         PropertyUsageRule rule = new PropertyUsageRule();
@@ -141,18 +135,4 @@ public final class TestPropertyUsageRule {
 //
 //    }
 
-    @Test
-    public void testReadPropertiesFromFiles() throws IOException {
-        Map<String, Integer> expected = Maps.newHashMap();
-        expected.put("my.property.value", 1);
-        expected.put("other.prop.val", 1);
-        expected.put("my-too.property.value", 1);
-        expected.put("other-too.prop.val", 1);
-        Collection<FileSpec> fileSpecs = Arrays.asList(
-                new FileSpec("src/main/resources/app1.properties"),
-                new FileSpec("src/main/resources/app2.properties")
-        );
-        Map<String, Integer> properties = PropertyUsageRule.readPropertiesFromFiles(fileSpecs);
-        assertEquals("Read properties are as expected", expected, properties);
-    }
 }

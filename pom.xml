@@ -314,17 +314,18 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- Test -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <!-- slf4j mock logger -->
+            <dependency>
+                <groupId>uk.org.lidalia</groupId>
+                <artifactId>slf4j-test</artifactId>
+                <version>1.2.0</version>
             </dependency>
 
             <!-- QA -->
@@ -407,6 +408,16 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.lidalia</groupId>
+            <artifactId>slf4j-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
         </dependency>
 
         <!-- QA -->

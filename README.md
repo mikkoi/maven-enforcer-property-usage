@@ -37,8 +37,9 @@ Add the following to your project's `pom.xml` file:
                             <definitions>
                                 <!-- The files from which to read the used properties. -->
                                 <!-- default: src/main/resources/*.properties -->
-                                <!-- File is always used as a regular expression. -->
-                                <!-- When directory, all files are checked recursively. -->
+                                <!-- file is either a path to a file or dir. -->
+                                <!-- Patterns (wildcards) not supported at the moment. -->
+                                <!-- When directory, all files in it are checked recursively. -->
                                 <files>
                                     <file></file>
                                 </files>
@@ -52,8 +53,9 @@ Add the following to your project's `pom.xml` file:
                             <usages>
                                 <!-- The files to check for the used properties. -->
                                 <!-- default: src/main/java -->
-                                <!-- File is always used as a regular expression. -->
-                                <!-- When directory, all files are checked recursively. -->
+                                <!-- file is either a path to a file or dir. -->
+                                <!-- Patterns (wildcards) not supported at the moment. -->
+                                <!-- When directory, all files in it are checked recursively. -->
                                 <files>
                                     <file></file>
                                 </files>

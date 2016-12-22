@@ -6,7 +6,7 @@ public class FileSpec {
     @Nonnull
     private final String value;
 
-    public FileSpec(@Nonnull final String file) {
+    FileSpec(@Nonnull final String file) {
         value = file;
     }
 
@@ -14,4 +14,8 @@ public class FileSpec {
     public String getFile() {
         return value;
     }
+
+    @Override
+    @Nonnull
+    public String toString() { return value; }
 }

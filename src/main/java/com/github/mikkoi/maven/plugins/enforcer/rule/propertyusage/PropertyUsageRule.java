@@ -19,59 +19,27 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
  * under the License.
  */
 
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.*;
-import com.google.common.io.ByteStreams;
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Files;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Template;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Verifies for usage of properties mentioned in .properties files.
  */
 @SuppressWarnings("WeakerAccess")
 public final class PropertyUsageRule implements EnforcerRule {
-
-    Log log = null;
-    @Nonnull
-    private static final String INCLUDE_REGEX_DEFAULT = ".*";
-    @Nonnull
-    private static final String EXCLUDE_REGEX_DEFAULT = "";
-    @Nonnull
-    private static final String DIRECTORY_DEFAULT = "src";
-
-    /**
-     * Definitions
-     */
-    @Nonnull
-    private Collection<Collection<FileSpec>> definitions = Definitions.DEFAULT;
-
-    /**
-     * Templates
-     */
-    @Nonnull
-    private Collection<Template> templates = Templates.DEFAULT;
-
-    /**
-     * Usages
-     */
-    @Nonnull
-    private Collection<Collection<FileSpec>> usages = Usages.DEFAULT;
 
     /**
      * Properties which were not found in usages.
@@ -85,43 +53,38 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     private final Set<String> propertiesNotDefined = Collections.emptySet();
 
-    ///////////////
     /**
-     * Faulty files list. Can be accessed after processing execute().
+     * Properties which were defined more than once.
      */
     @Nonnull
-    private final Collection<FileResult> faultyFiles = new ArrayList<>();
-    /**
-     * Validate files must match this requireEncoding.
-     * Default: ${project.builder.sourceEncoding}.
-     */
-    @Nullable
-    private String requireEncoding = null;
-    /**
-     * Directory to search for files.
-     */
-    @Nullable
-    private String directory = null;
-    /**
-     * Regular Expression to match file names against for filtering in.
-     */
-    @Nullable
-    private String includeRegex = null;
-    /**
-     * Regular Expression to match file names against for filtering out
-     * Can be used together with includeRegex.
-     * includeRegex will first pick files in,
-     * then excludeRegex will filter out files from the selected ones.
-     */
-    @Nullable
-    private String excludeRegex = null;
+    private final Set<String> propertiesDefinedMoreThanOnce = Collections.emptySet();
 
     /**
-     * Get the faulty files list.
+     * Logger given by Maven Enforcer.
+     */
+    Log log = null;
+
+    /**
+     * Definitions
      */
     @Nonnull
-    public Collection<FileResult> getFaultyFiles() {
-        return faultyFiles;
+    private Collection<Collection<String>> definitions = Definitions.DEFAULT;
+
+    /**
+     * Templates
+     */
+    @Nonnull
+    private Collection<Template> templates = Templates.DEFAULT;
+
+    /**
+     * Usages
+     */
+    @Nonnull
+    private Collection<Collection<String>> usages = Usages.DEFAULT;
+
+    @Nonnull
+    public Set<String> getPropertiesDefinedMoreThanOnce() {
+        return propertiesDefinedMoreThanOnce;
     }
 
     /**
@@ -133,6 +96,16 @@ public final class PropertyUsageRule implements EnforcerRule {
             throws EnforcerRuleException {
         log = helper.getLog();
 
+        // Get all the files to read for the properties definitions.
+
+        Files fileSpecs = new Files(log);
+        //Collection<String> filenames = fileSpecs.getAbsoluteFilenames();
+        //filenames = filenames.stream().sorted().collect(Collectors.toSet());
+
+        // Get the definitions and how many times they are defined.
+        //HashMap<String, Integer> propsDefs =
+
+                /*
         try {
             // get the various expressions out of the helper.
             String basedir = helper.evaluate("${project.basedir}").toString();
@@ -205,29 +178,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                     "Unable to lookup an expression " + e.getLocalizedMessage(), e
             );
         }
-    }
-
-    @Nonnull
-    private Collection<FileResult> getFileResults(final Log log, final Path dir) {
-        Collection<FileResult> allFiles = new ArrayList<>();
-        FileVisitor<Path> fileVisitor = new com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule.GetEncodingsFileVisitor(
-                log,
-                this.getIncludeRegex() != null ? this.getIncludeRegex() : INCLUDE_REGEX_DEFAULT,
-                this.getExcludeRegex() != null ? this.getExcludeRegex() : EXCLUDE_REGEX_DEFAULT,
-                allFiles
-        );
-        try {
-            Set<FileVisitOption> visitOptions = new LinkedHashSet<>();
-            visitOptions.add(FileVisitOption.FOLLOW_LINKS);
-            java.nio.file.Files.walkFileTree(dir,
-                    visitOptions,
-                    Integer.MAX_VALUE,
-                    fileVisitor
-            );
-        } catch (Exception e) {
-            log.error(e.getCause() + e.getMessage());
-        }
-        return allFiles;
+        */
     }
 
     /**
@@ -279,50 +230,6 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Getters and setters for the parameters (these are filled by Maven).
      */
 
-    @SuppressWarnings("WeakerAccess")
-    @Nullable
-    public String getDirectory() {
-        return directory;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setDirectory(@Nullable final String directory) {
-        this.directory = directory;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @Nullable
-    public String getIncludeRegex() {
-        return includeRegex;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setIncludeRegex(@Nullable final String includeRegex) {
-        this.includeRegex = includeRegex;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @Nullable
-    public String getExcludeRegex() {
-        return excludeRegex;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setExcludeRegex(@Nullable final String excludeRegex) {
-        this.excludeRegex = excludeRegex;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @Nullable
-    public String getRequireEncoding() {
-        return requireEncoding;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setRequireEncoding(@Nullable final String requireEncoding) {
-        this.requireEncoding = requireEncoding;
-    }
-
     @Nonnull
     public Set<String> getPropertiesNotUsed() {
         return propertiesNotUsed;
@@ -333,7 +240,7 @@ public final class PropertyUsageRule implements EnforcerRule {
         return propertiesNotDefined;
     }
 
-    public void setDefinitions(@Nonnull final Collection<Collection<FileSpec>> definitions) {
+    public void setDefinitions(@Nonnull final Collection<Collection<String>> definitions) {
         this.definitions = definitions;
     }
 
@@ -341,111 +248,8 @@ public final class PropertyUsageRule implements EnforcerRule {
         this.templates = templates;
     }
 
-    public void setUsages(@Nonnull Collection<Collection<FileSpec>> usages) {
+    public void setUsages(@Nonnull Collection<Collection<String>> usages) {
         this.usages = usages;
-    }
-
-    /**
-     * @param fileSpecs Collection of file specs to read properties from.
-     * @return Map of definitions and how many times they are defined.
-     */
-    @Nonnull
-    public static Map<String, Integer> readPropertiesFromFiles(@Nonnull final Collection<FileSpec> fileSpecs)
-            throws IOException {
-        Map<String, Integer> results = new HashMap<>();
-        for (FileSpec fileSpec : fileSpecs) {
-            File file = new File(fileSpec.getFile());
-            Properties properties = new Properties();
-            try (InputStream inputStream = new FileInputStream(file)) {
-                properties.load(inputStream);
-                Set<String> names = properties.stringPropertyNames();
-                for (String name : names) {
-                    if (!results.containsKey(name)) {
-                        results.put(name, 0);
-                    } else {
-                        results.replace(name, results.get(name) + 1);
-                    }
-                }
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Extended SimpleFileVisitor for walking through the files.
-     */
-    private static class GetEncodingsFileVisitor extends SimpleFileVisitor<Path> {
-        @Nonnull
-        private final Log log;
-        private final boolean includeRegexUsed;
-        @Nonnull
-        private final Pattern includeRegexPattern;
-        private final boolean excludeRegexUsed;
-        @Nonnull
-        private final Pattern excludeRegexPattern;
-        @Nonnull
-        private final Collection<FileResult> results;
-
-        /**
-         * Constructor.
-         *
-         * @param pluginLog    Maven Plugin logging channel.
-         * @param includeRegex Include regex pattern.
-         * @param excludeRegex Exclude regex pattern.
-         * @param fileResults  Initialized collection to be filled.
-         */
-        GetEncodingsFileVisitor(
-                @Nonnull final Log pluginLog,
-                @Nonnull final String includeRegex,
-                @Nonnull final String excludeRegex,
-                @Nonnull final Collection<FileResult> fileResults
-        ) {
-            this.log = pluginLog;
-            // Attn. Because we have includeRegex default (.*) which replaces
-            // an empty includeRegex, includeRegex can never have length 0 chars!
-            // But excludeRegex can have length 0 chars!
-            includeRegexUsed = true;
-            includeRegexPattern = Pattern.compile(includeRegex);
-            if (excludeRegex.length() > 0) {
-                excludeRegexUsed = true;
-                excludeRegexPattern = Pattern.compile(excludeRegex);
-            } else {
-                excludeRegexUsed = false;
-                excludeRegexPattern = Pattern.compile("");
-            }
-            this.results = fileResults;
-        }
-
-        @Override
-        public FileVisitResult visitFile(
-                final Path aFile, final BasicFileAttributes aAttrs
-        ) throws IOException {
-            log.debug("Visiting file '" + aFile.toString() + "'.");
-            if (includeRegexUsed && !includeRegexPattern.matcher(aFile.toString()).find()) {
-                log.debug("FileSpec not matches includeRegex in-filter. Exclude file from list!");
-                return FileVisitResult.CONTINUE;
-            }
-            if (excludeRegexUsed && excludeRegexPattern.matcher(aFile.toString()).find()) {
-                log.debug("FileSpec matches excludeRegex out-filter. Exclude file from list!");
-                return FileVisitResult.CONTINUE;
-            }
-            log.debug("FileSpec matches includeRegex in-filter and not matches excludeRegex out-filter. Include file to list!");
-            File file = aFile.toFile();
-            FileResult res = new FileResult.Builder(aFile.toAbsolutePath())
-                    .lastModified(file.lastModified())
-                    .build();
-            results.add(res);
-            return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult preVisitDirectory(
-                final Path aDir, final BasicFileAttributes aAttrs
-        ) throws IOException {
-            log.debug("Visiting directory '" + aDir.toString() + "'.");
-            return FileVisitResult.CONTINUE;
-        }
-
     }
 
 }
