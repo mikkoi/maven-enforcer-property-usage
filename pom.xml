@@ -321,12 +321,6 @@
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
             </dependency>
-            <!-- slf4j mock logger -->
-            <dependency>
-                <groupId>uk.org.lidalia</groupId>
-                <artifactId>slf4j-test</artifactId>
-                <version>1.2.0</version>
-            </dependency>
 
             <!-- QA -->
             <dependency>
@@ -353,7 +347,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            </dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -407,11 +401,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>uk.org.lidalia</groupId>
-            <artifactId>slf4j-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

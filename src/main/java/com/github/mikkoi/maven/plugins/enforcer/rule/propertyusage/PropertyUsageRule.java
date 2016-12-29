@@ -19,21 +19,28 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
  * under the License.
  */
 
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.FileUsageLocation;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Files;
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Template;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Verifies for usage of properties mentioned in .properties files.
@@ -42,143 +49,191 @@ import java.util.Set;
 public final class PropertyUsageRule implements EnforcerRule {
 
     /**
+     * Properties which were defined more than once.
+     */
+    @Nonnull
+    private final Map<String, Integer> propertiesDefinedMoreThanOnce = new HashMap<>();
+
+    /**
      * Properties which were not found in usages.
      */
     @Nonnull
-    private final Set<String> propertiesNotUsed = Collections.emptySet();
+    private final Set<String> propertiesNotUsed = new HashSet<>();
 
     /**
      * Properties which were used in usages but not defined in definitions.
      */
     @Nonnull
-    private final Set<String> propertiesNotDefined = Collections.emptySet();
-
-    /**
-     * Properties which were defined more than once.
-     */
-    @Nonnull
-    private final Set<String> propertiesDefinedMoreThanOnce = Collections.emptySet();
+    private final Set<FileUsageLocation> propertiesNotDefined = new HashSet<>();
 
     /**
      * Logger given by Maven Enforcer.
      */
     Log log = null;
 
+    //
+    // Following variables match the configuration items and are populated by Enforcer,
+    // despite being private.
+    //
+
+    /**
+     * Activate definitionsOnlyOnce
+     */
+    private boolean definitionsOnlyOnce = true;
+
+    /**
+     * Activate definedPropertiesAreUsed
+     */
+    private boolean definedPropertiesAreUsed = true;
+
+    /**
+     * Activate usedPropertiesAreDefined
+     */
+    private boolean usedPropertiesAreDefined = true;
+
+    /**
+     * Replace this string with property name in template(s).
+     */
+    @Nonnull
+    private String replaceInTemplateWithPropertyName = Templates.getDefaultReplaceInTemplateWithPropertyName();
+
     /**
      * Definitions
      */
     @Nonnull
-    private Collection<Collection<String>> definitions = Definitions.DEFAULT;
-
+    private Collection<String> definitions = Definitions.getDefault();
     /**
      * Templates
      */
     @Nonnull
-    private Collection<Template> templates = Templates.DEFAULT;
-
+    private Collection<String> templates = Templates.getDefault();
     /**
      * Usages
      */
     @Nonnull
-    private Collection<Collection<String>> usages = Usages.DEFAULT;
-
-    @Nonnull
-    public Set<String> getPropertiesDefinedMoreThanOnce() {
-        return propertiesDefinedMoreThanOnce;
-    }
+    private Collection<String> usages = Usages.getDefault();
 
     /**
      * @param helper EnforcerRuleHelper
      * @throws EnforcerRuleException Throws when error
      */
     @Override
+    @SuppressWarnings({
+            "squid:S1067", // Expressions should not be too complex
+            "squid:S1192"  // String literals should not be duplicated
+    })
+    //@SuppressWarnings("squid:S1192")
     public void execute(@Nonnull final EnforcerRuleHelper helper)
             throws EnforcerRuleException {
         log = helper.getLog();
 
-        // Get all the files to read for the properties definitions.
-
-        Files fileSpecs = new Files(log);
-        //Collection<String> filenames = fileSpecs.getAbsoluteFilenames();
-        //filenames = filenames.stream().sorted().collect(Collectors.toSet());
-
-        // Get the definitions and how many times they are defined.
-        //HashMap<String, Integer> propsDefs =
-
-                /*
+        Charset sourceEncoding = Charset.forName("UTF-8");
         try {
-            // get the various expressions out of the helper.
-            String basedir = helper.evaluate("${project.basedir}").toString();
+            sourceEncoding = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+        } catch (ExpressionEvaluationException | NullPointerException e) {
+            log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
+        }
 
-            log.debug("Retrieved Basedir: " + basedir);
-            log.debug("requireEncoding: " + (requireEncoding == null ? "null" : requireEncoding));
-            log.debug("directory: " + (directory == null ? "null" : directory));
+        log.debug("PropertyUsageRule:execute");
+        log.debug(definitions.toString());
+        log.debug(templates.toString());
+        log.debug(usages.toString());
 
-//            log.debug("requireEncoding: " + this.getRequireEncoding());
-//            log.debug("directory: " + this.getDirectory());
-//            log.debug("includeRegex: " + this.getIncludeRegex());
-//            log.debug("excludeRegex: " + this.getExcludeRegex());
+        try {
+            // Get property definitions (i.e. property names):
+            // Get all the files to read for the properties definitions.
+            Files files = new Files(log);
+            final Collection<String> propertyFilenames = files.getAbsoluteFilenames(definitions)
+                    .stream().sorted().collect(Collectors.toSet());
+            // Get the property definitions and how many times they are defined.
+            Map<String, Integer> propsDefs;
+            if (definitionsOnlyOnce) {
+                propsDefs = new PropertyFiles(log).readPropertiesFromFilesWithCount(propertyFilenames);
+                propsDefs.forEach((key, value) -> {
+                    log.debug("Property '" + key + "' defined " + value + " times.");
+                    if (value > 1) {
+                        this.propertiesDefinedMoreThanOnce.put(key, value);
+                    }
+                });
+            } else {
+                propsDefs = new PropertyFiles(log).readPropertiesFromFilesWithoutCount(propertyFilenames);
+            }
 
-            // Check the existence of the wanted directory:
-            final Path dir = Paths.get(basedir, getDirectory());
-            log.debug("Get files in dir '" + dir.toString() + "'.");
-            if (!dir.toFile().exists()) {
-                throw new EnforcerRuleException(
-                        "Directory '" + dir.toString() + "' not found."
-                                + " Specified by parameter 'directory' (value: '" + this.getDirectory() + "')!"
+            // Get all the files to check for property usage. *.java, *.jsp, etc.
+            final Collection<String> usageFilenames = files.getAbsoluteFilenames(usages)
+                    .stream().sorted().collect(Collectors.toSet());
+
+            // Iterate through files and collect property usage.
+            // Iterate
+            UsageFiles usageFiles = new UsageFiles(log);
+            if (usedPropertiesAreDefined) {
+                final Collection<String> readyTemplates = new HashSet<>();
+                templates.forEach(tpl -> readyTemplates.add(
+                        tpl.replaceAll(replaceInTemplateWithPropertyName, "\\S+"))
                 );
-            }
-
-            // Put all files into this collection:
-            Collection<FileResult> allFiles = getFileResults(log, dir);
-
-            // Copy faulty files to another list.
-            log.debug("Moving possible faulty files (faulty encoding) to another list.");
-            for (FileResult res : allFiles) {
-                log.debug("Checking if file '" + res.getPath().toString() + "' has encoding '" + requireEncoding + "'.");
-                boolean hasCorrectEncoding = true;
-                try (FileInputStream fileInputStream = new FileInputStream(res.getPath().toFile())) {
-                    byte[] bytes = ByteStreams.toByteArray(fileInputStream);
-                    Charset charset = Charset.forName(this.getRequireEncoding());
-                    CharsetDecoder decoder = charset.newDecoder();
-                    ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-                    decoder.decode(byteBuffer);
-                } catch (CharacterCodingException e) {
-                    hasCorrectEncoding = false;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    log.error(e.getMessage());
-                    hasCorrectEncoding = false;
+                final Collection<FileUsageLocation> usageLocations
+                        = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
+                usageLocations.forEach(loc -> {
+                    if (!propsDefs.containsKey(loc.getProperty())) {
+                        log.debug("Property " + loc.getProperty() + " not defined.");
+                        propertiesNotDefined.add(loc);
+                    }
+                });
+                if (definedPropertiesAreUsed) {
+                    final Collection<String> usagesTmp = Collections.emptySet();
+                    usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
+                    propsDefs.forEach((key, nrOf) -> {
+                        if (!usagesTmp.contains(key)) {
+                            propertiesNotUsed.add(key);
+                        }
+                    });
                 }
-                if (!hasCorrectEncoding) {
-                    log.debug("Moving faulty file: " + res.getPath());
-                    FileResult faultyFile = new FileResult.Builder(res.getPath())
-                            .lastModified(res.getLastModified())
-                            .build();
-                    faultyFiles.add(faultyFile);
-                } else {
-                    log.debug("Has correct encoding. Not moving to faulty files list.");
-                }
+            } else if (definedPropertiesAreUsed) {
+                final Collection<FileUsageLocation> usageLocations
+                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, propsDefs.keySet(), templates, sourceEncoding);
+                final Collection<String> usagesTmp = new HashSet<>();
+                usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
+                propsDefs.forEach((key, nrOf) -> {
+                    if (!usagesTmp.contains(key)) {
+                        propertiesNotUsed.add(key);
+                    }
+                });
             }
-            log.debug("All faulty files moved.");
-
-            // Report
-            if (!faultyFiles.isEmpty()) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("Wrong encoding in following files:");
-                builder.append(System.getProperty("line.separator"));
-                for (FileResult res : faultyFiles) {
-                    builder.append(res.getPath());
-                    builder.append(System.getProperty("line.separator"));
-                }
-                throw new EnforcerRuleException(builder.toString());
-            }
-        } catch (ExpressionEvaluationException e) {
+        } catch (IOException e) {
             throw new EnforcerRuleException(
-                    "Unable to lookup an expression " + e.getLocalizedMessage(), e
+                    "IO error: " + e.getLocalizedMessage(), e
             );
         }
-        */
+
+        // Report errors in wanted categories:
+        // propertiesDefinedMoreThanOnce
+        if (definitionsOnlyOnce) {
+            propertiesDefinedMoreThanOnce.forEach((key, value) ->
+                    log.error("Property " + key + " defined " + value + " times!")
+            );
+        }
+        // propertiesNotUsed
+        if (definedPropertiesAreUsed) {
+            propertiesNotUsed.forEach(key ->
+                    log.error("Property " + key + " not used!")
+            );
+        }
+        // propertiesNotDefined
+        if (usedPropertiesAreDefined) {
+            propertiesNotDefined.forEach(loc ->
+                    log.error("Property " + loc.getProperty() + " used without defining it ("
+                            + loc.filename + ":" + loc.getRow() + ")"));
+        }
+
+        // Fail rule if errors in wanted categories.
+        if ((definedPropertiesAreUsed && !propertiesNotUsed.isEmpty())
+                || (usedPropertiesAreDefined && !propertiesNotDefined.isEmpty())
+                || (definitionsOnlyOnce && !propertiesDefinedMoreThanOnce.isEmpty())
+                ) {
+            throw new EnforcerRuleException(
+                    "Errors in property definitions or usage!"
+            );
+        }
     }
 
     /**
@@ -227,7 +282,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     /**
-     * Getters and setters for the parameters (these are filled by Maven).
+     * Getters for results, used for testing.
      */
 
     @Nonnull
@@ -236,20 +291,77 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     @Nonnull
-    public Set<String> getPropertiesNotDefined() {
+    public Set<FileUsageLocation> getPropertiesNotDefined() {
         return propertiesNotDefined;
     }
 
-    public void setDefinitions(@Nonnull final Collection<Collection<String>> definitions) {
+    @Nonnull
+    public Map<String, Integer> getPropertiesDefinedMoreThanOnce() {
+        return propertiesDefinedMoreThanOnce;
+    }
+
+    /**
+     * Setters for the parameters
+     * (these are not used by Maven Enforcer, used for testing).
+     */
+
+    public void setDefinitions(@Nonnull final Collection<String> definitions) {
         this.definitions = definitions;
     }
 
-    public void setTemplates(@Nonnull final Collection<Template> templates) {
+    public void setTemplates(@Nonnull final Collection<String> templates) {
         this.templates = templates;
     }
 
-    public void setUsages(@Nonnull Collection<Collection<String>> usages) {
+    public void setUsages(@Nonnull Collection<String> usages) {
         this.usages = usages;
     }
 
+    public void setDefinedPropertiesAreUsed(final boolean definedPropertiesAreUsed) {
+        this.definedPropertiesAreUsed = definedPropertiesAreUsed;
+    }
+
+    public void setUsedPropertiesAreDefined(final boolean usedPropertiesAreDefined) {
+        this.usedPropertiesAreDefined = usedPropertiesAreDefined;
+    }
+
+    public void setDefinitionsOnlyOnce(final boolean definitionsOnlyOnce) {
+        this.definitionsOnlyOnce = definitionsOnlyOnce;
+    }
+
+    public void setReplaceInTemplateWithPropertyName(@Nonnull final String replaceInTemplateWithPropertyName) {
+        this.replaceInTemplateWithPropertyName = replaceInTemplateWithPropertyName;
+    }
+
+    public boolean isDefinedPropertiesAreUsed() {
+        return definedPropertiesAreUsed;
+    }
+
+    public boolean isUsedPropertiesAreDefined() {
+        return usedPropertiesAreDefined;
+    }
+
+    public boolean isDefinitionsOnlyOnce() {
+        return definitionsOnlyOnce;
+    }
+
+    @Nonnull
+    public String getReplaceInTemplateWithPropertyName() {
+        return replaceInTemplateWithPropertyName;
+    }
+
+    @Nonnull
+    public Collection<String> getDefinitions() {
+        return definitions;
+    }
+
+    @Nonnull
+    public Collection<String> getTemplates() {
+        return templates;
+    }
+
+    @Nonnull
+    public Collection<String> getUsages() {
+        return usages;
+    }
 }

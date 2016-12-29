@@ -1,15 +1,19 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Template;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Files;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugins.enforcer.EnforcerTestUtils;
+import org.junit.Test;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -17,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  */
 public final class TestPropertyUsageRule {
 
-//    @Test
+    //    @Test
 //    public void testValidFiles1() {
 //        testFiles(true, 0, "UTF-8", "src/test/resources", "utf-8.txt", StringUtils.EMPTY);
 //    }
@@ -91,15 +95,33 @@ public final class TestPropertyUsageRule {
 //    }
 //
     private void testProps(
-            boolean expected,
-            @Nonnull final Set<String> propertiesNotUsed, // There names were never used.
-            @Nonnull final Set<String> propertiesNotDefined, // There names were not defined.
-            @Nullable final Collection<Collection<String>> definitions,
-            @Nullable final Collection<Template> templates,
-            @Nullable final Collection<Collection<String>> usages
+            // Configuration (null value => use defaults)
+            @Nullable final Boolean definitionsOnlyOnce,
+            @Nullable final Boolean definedPropertiesAreUsed,
+            @Nullable final Boolean usedPropertiesAreDefined,
+            @Nullable final String replaceInTemplateWithPropertyName,
+            @Nullable final Collection<String> definitions,
+            @Nullable final Collection<String> templates,
+            @Nullable final Collection<String> usages,
+            // Results
+            boolean expected, // Rule passes.
+            @Nonnull final Collection<String> propertiesDefinedMoreThanOnce, // There names were defined more than once.
+            @Nonnull final Collection<String> propertiesNotUsed, // These names were never used.
+            @Nonnull final Collection<String> propertiesNotDefined // These names were not defined.
     ) {
         boolean isValid;
         PropertyUsageRule rule = new PropertyUsageRule();
+
+        // Configuration.
+        if (definitionsOnlyOnce != null) {
+            rule.setDefinitionsOnlyOnce(definitionsOnlyOnce);
+        }
+        if (definedPropertiesAreUsed != null) {
+            rule.setDefinedPropertiesAreUsed(definedPropertiesAreUsed);
+        }
+        if (usedPropertiesAreDefined != null) {
+            rule.setUsedPropertiesAreDefined(usedPropertiesAreDefined);
+        }
         if (definitions != null) {
             rule.setDefinitions(definitions);
         }
@@ -109,6 +131,11 @@ public final class TestPropertyUsageRule {
         if (usages != null) {
             rule.setUsages(usages);
         }
+        if (replaceInTemplateWithPropertyName != null) {
+            rule.setReplaceInTemplateWithPropertyName(replaceInTemplateWithPropertyName);
+        }
+
+        // Run rule.
         try {
             EnforcerRuleHelper helper = EnforcerTestUtils.getHelper();
             rule.execute(helper);
@@ -121,11 +148,89 @@ public final class TestPropertyUsageRule {
         }
         assertTrue(isValid == expected);
         assertTrue(rule.getPropertiesNotUsed().equals(propertiesNotUsed));
-        assertTrue(rule.getPropertiesNotDefined().equals(propertiesNotDefined));
+        final Set<String> resultPropertiesNodDefined = new HashSet<>();
+        rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNodDefined.add(val.getProperty()));
+        assertTrue(resultPropertiesNodDefined.equals(propertiesNotDefined));
+        assertTrue(rule.getPropertiesDefinedMoreThanOnce().keySet().equals(propertiesDefinedMoreThanOnce));
+    }
+
+    // Implement feature first.
+//    @Test
+//    public void testPropertyUsageRuleDefinitionsOnlyOnceFail() {
+//        final Collection<String> propertiesDefinedMoreThanOnce = new HashSet<>();
+//        propertiesDefinedMoreThanOnce.add("my.property.value");
+//        propertiesDefinedMoreThanOnce.add("third.property.value");
+//        testProps(
+//                true,
+//                false,
+//                false,
+//                null,
+//                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1-double-def.properties")),
+//                null,
+//                null,
+//                false,
+//                propertiesDefinedMoreThanOnce,
+//                Collections.emptySet(),
+//                Collections.emptySet()
+//        );
+//    }
+//
+//    @Test
+//    public void testPropertyUsageRuleDefinitionsOnlyOnceOk() {
+//        testProps(
+//                true,
+//                false,
+//                false,
+//                null,
+//                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1-double-def.properties")),
+//                null,
+//                null,
+//                true,
+//                Collections.emptySet(),
+//                Collections.emptySet(),
+//                Collections.emptySet()
+//        );
+//    }
+//
+    @Test
+    public void testPropertyUsageRuleOk() {
+        testProps(
+                false,
+                true,
+                false,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1.properties")),
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleFail() {
+        final Collection<String> propertiesNotUsed = new HashSet<>();
+        propertiesNotUsed.add("my-too.property.value");
+        propertiesNotUsed.add("other-too.prop.val");
+        testProps(
+                false,
+                true,
+                false,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                false,
+                Collections.emptySet(),
+                propertiesNotUsed,
+                Collections.emptySet()
+        );
     }
 
 //    @Test
-//    public void testReadPropertiesDefault() {
+//    public void testReadPropertiesWithDefaultConfiguration() {
 //        Map<String, Integer> expected = Maps.newHashMap();
 //        expected.put("my.property.value", 0);
 //        expected.put("other.prop.val", 0);
@@ -135,4 +240,15 @@ public final class TestPropertyUsageRule {
 //
 //    }
 
+    @Test
+    public void testDefaultValues() {
+        PropertyUsageRule rule = new PropertyUsageRule();
+        assertEquals("Default definitionsOnlyOnce is true", true, rule.isDefinitionsOnlyOnce());
+        assertEquals("Default definedPropertiesAreUsed is true", true, rule.isDefinedPropertiesAreUsed());
+        assertEquals("Default usedPropertiesAreDefined is true", true, rule.isUsedPropertiesAreDefined());
+        assertEquals("Default replaceInTemplateWithPropertyName is correct", "REPLACE_THIS", rule.getReplaceInTemplateWithPropertyName());
+        assertEquals("Default definitions are correct", Collections.singleton(Files.absoluteCwdAndFile("src/main/resources")), rule.getDefinitions());
+        assertEquals("Default templates are correct", Collections.singleton("\"(REPLACE_THIS+)\""), rule.getTemplates());
+        assertEquals("Default usages are correct", Collections.singleton(Files.absoluteCwdAndFile("src/main/java")), rule.getUsages());
+    }
 }

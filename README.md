@@ -30,19 +30,18 @@ Add the following to your project's `pom.xml` file:
                 </goals>
                 <configuration>
                     <rules>
-                        <useAllProperties implementation="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule">
-                            <definedPropertiesAreUsed/>
-                            <usedPropertiesAreDefined/>
-                            <definitionsOnlyOnce/>
+                        <enforceProperties implementation="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule">
+                            <definitionsOnlyOnce>true</definitionsOnlyOnce>
+                            <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
+                            <usedPropertiesAreDefined>true</usedPropertiesAreDefined>
+                            <replaceInTemplateWithPropertyName>REPLACE_THIS<replaceInTemplateWithPropertyName>
                             <definitions>
                                 <!-- The files from which to read the used properties. -->
                                 <!-- default: src/main/resources/*.properties -->
                                 <!-- file is either a path to a file or dir. -->
                                 <!-- Patterns (wildcards) not supported at the moment. -->
                                 <!-- When directory, all files in it are checked recursively. -->
-                                <files>
-                                    <file></file>
-                                </files>
+                                <file></file>
                             </definitions>
                             <templates>
                                 <!-- The usage templates. -->
@@ -60,7 +59,7 @@ Add the following to your project's `pom.xml` file:
                                     <file></file>
                                 </files>
                             </usages>
-                        </useAllProperties>
+                        </enforceProperties>
                     </rules>
                     <!-- Fail build if wrong encoding encountered. -->
                     <fail>true</fail>

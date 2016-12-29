@@ -1,6 +1,7 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import com.google.common.collect.Maps;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -13,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 
 public class PropertyFilesTest {
 
+    private SystemStreamLog slog = new SystemStreamLog();
+
     @Test
     public void readPropertiesFromFiles_Normal() throws Exception {
         Map<String, Integer> expected = Maps.newHashMap();
@@ -21,12 +24,14 @@ public class PropertyFilesTest {
         expected.put("my-too.property.value", 2);
         expected.put("other-too.prop.val", 1);
         expected.put("other-three.prop.val", 1);
+        expected.put("my-too.property.value", 1);
         Collection<String> filenames = Arrays.asList(
                 "src/test/resources/app1.properties",
                 "src/test/resources/app2.properties",
                 "src/test/resources/app3.properties"
         );
-        Map<String, Integer> properties = PropertyFiles.readPropertiesFromFiles(filenames);
+        PropertyFiles propertyFiles = new PropertyFiles(slog);
+        Map<String, Integer> properties = propertyFiles.readPropertiesFromFilesWithoutCount(filenames);
         assertEquals("Read properties are as expected.", expected, properties);
     }
 
@@ -35,7 +40,8 @@ public class PropertyFilesTest {
         Collection<String> filenames = Collections.singletonList(
                 "src/test/resources/not-exists.properties"
         );
-        Map<String, Integer> properties = PropertyFiles.readPropertiesFromFiles(filenames);
+        PropertyFiles propertyFiles = new PropertyFiles(slog);
+        Map<String, Integer> properties = propertyFiles.readPropertiesFromFilesWithoutCount(filenames);
         assertEquals(null, properties);
     }
 
@@ -45,7 +51,8 @@ public class PropertyFilesTest {
         Collection<String> filenames = Collections.singletonList(
                 "src/test/resources/empty.properties"
         );
-        Map<String, Integer> properties = PropertyFiles.readPropertiesFromFiles(filenames);
+        PropertyFiles propertyFiles = new PropertyFiles(slog);
+        Map<String, Integer> properties = propertyFiles.readPropertiesFromFilesWithoutCount(filenames);
         assertEquals("Read properties are as expected (empty)", expected, properties);
     }
 

@@ -15,7 +15,7 @@ public class App1 {
         try (InputStream inputStream = new FileInputStream("app1.properties") ) {
             properties.load(inputStream);
             myPropertyValue = properties.getProperty("my.property.value");
-            otherPropVal = Integer.valueOf(properties.getProperty("other.prop.value"));
+            otherPropVal = Integer.valueOf(properties.getProperty("other.prop.val"));
 
         } catch (Exception e) {
             System.out.print(e.getMessage());

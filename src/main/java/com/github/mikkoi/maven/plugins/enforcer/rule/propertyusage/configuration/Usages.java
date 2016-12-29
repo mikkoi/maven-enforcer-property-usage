@@ -1,5 +1,6 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -7,11 +8,17 @@ import static com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.config
 
 public class Usages {
 
-    public static final Collection<Collection<String>> DEFAULT = Collections.singletonList(
-            // Future solution: absoluteCwdAndFile("src/main/java/[[:print:]]+\\.java")
-            Collections.singleton(absoluteCwdAndFile("src/main/java"))
-    );
+    private Usages() {
+    }
 
-    private Usages() {}
-
+    /**
+     * Get Default value
+     *
+     * @return collection of strings
+     */
+    @Nonnull
+    public static Collection<String> getDefault() {
+        // Future solution: absoluteCwdAndFile("src/main/java/[[:print:]]+\\.java")
+        return Collections.singleton(absoluteCwdAndFile("src/main/java"));
+    }
 }

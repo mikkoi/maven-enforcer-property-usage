@@ -29,31 +29,42 @@ public class Files {
         log = logger;
     }
 
-    static String absoluteCwdAndFile(@Nonnull final String filename) {
+    public static String absoluteCwdAndFile(@Nonnull final String filename) {
         return Paths.get(System.getProperty("user.dir"), filename).toAbsolutePath().normalize().toString();
     }
 
+    /**
+     *
+     * @param files A Collection of Strings
+     * @return A Collection of Strings
+     * @throws IOException, if file not found.
+     */
     @Nonnull
-    Collection<String> getAbsoluteFilenames(@Nonnull final Collection<String> files) throws IOException {
+    public Collection<String> getAbsoluteFilenames(@Nonnull final Collection<String> files) throws IOException {
         Collection<String> allFilenames = new HashSet<>();
         for (String fileSpec : files) {
             File file = new File(fileSpec);
             if (file.exists()) {
                 if (file.isDirectory()) {
-                    log.debug("File spec '" + fileSpec + "' is a directory.");
+                    log.debug(logFileIterationMsg(fileSpec, "is a directory") + ".");
                     Collection<String> filenames = getFilenamesFromDir(file.toPath());
                     allFilenames.addAll(filenames); // If item already in Set, discarded automatically.
                 } else if (file.isFile()) {
-                    log.debug("File spec '" + fileSpec + "' is a file.");
+                    log.debug(logFileIterationMsg(fileSpec, "is a file") + ".");
                     allFilenames.add(file.getAbsolutePath()); // If item already in Set, discarded automatically.
                 } else {
-                    log.error("File '" + fileSpec + "' is not a file or directory. Do not know what to do!");
+                    log.error(logFileIterationMsg(fileSpec, "is not a file or directory. Do not know what to do") + "!");
                 }
             } else {
-                log.error("File '" + fileSpec + "' does not exist!");
+                log.error(logFileIterationMsg(fileSpec, "does not exist") + "!");
             }
         }
         return allFilenames;
+    }
+
+    @Nonnull
+    private String logFileIterationMsg(@Nonnull final String filename, @Nonnull final String comment) {
+        return "File spec '" + filename + "' " + comment;
     }
 
     @Nonnull
