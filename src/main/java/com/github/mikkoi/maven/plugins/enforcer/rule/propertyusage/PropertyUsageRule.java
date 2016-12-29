@@ -35,7 +35,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -146,17 +145,17 @@ public final class PropertyUsageRule implements EnforcerRule {
             final Collection<String> propertyFilenames = files.getAbsoluteFilenames(definitions)
                     .stream().sorted().collect(Collectors.toSet());
             // Get the property definitions and how many times they are defined.
-            Map<String, Integer> propsDefs;
+            Map<String, Integer> definedProperties;
             if (definitionsOnlyOnce) {
-                propsDefs = new PropertyFiles(log).readPropertiesFromFilesWithCount(propertyFilenames);
-                propsDefs.forEach((key, value) -> {
+                definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithCount(propertyFilenames);
+                definedProperties.forEach((key, value) -> {
                     log.debug("Property '" + key + "' defined " + value + " times.");
                     if (value > 1) {
                         this.propertiesDefinedMoreThanOnce.put(key, value);
                     }
                 });
             } else {
-                propsDefs = new PropertyFiles(log).readPropertiesFromFilesWithoutCount(propertyFilenames);
+                definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithoutCount(propertyFilenames);
             }
 
             // Get all the files to check for property usage. *.java, *.jsp, etc.
@@ -166,36 +165,39 @@ public final class PropertyUsageRule implements EnforcerRule {
             // Iterate through files and collect property usage.
             // Iterate
             UsageFiles usageFiles = new UsageFiles(log);
+            if (definedPropertiesAreUsed) {
+                final Map<String,String> readyTemplates = new HashMap<>();
+                templates.forEach(tpl -> definedProperties.forEach(
+                        (propertyDefinition, nrPropertyDefinitions) ->
+                                readyTemplates.put(
+                                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyDefinition),
+                                        propertyDefinition
+                                )
+                        )
+                );
+                log.debug("readyTemplates:" + readyTemplates);
+                final Collection<FileUsageLocation> usageLocations
+                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
+                final Collection<String> usagesTmp = new HashSet<>();
+                usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
+                definedProperties.forEach((key, nrOf) -> {
+                    if (!usagesTmp.contains(key)) {
+                        propertiesNotUsed.add(key);
+                    }
+                });
+            }
             if (usedPropertiesAreDefined) {
                 final Collection<String> readyTemplates = new HashSet<>();
                 templates.forEach(tpl -> readyTemplates.add(
-                        tpl.replaceAll(replaceInTemplateWithPropertyName, "\\S+"))
+                        tpl.replaceAll(replaceInTemplateWithPropertyName, "\\[a-z\\.]\\{1,\\}")
+                        )
                 );
                 final Collection<FileUsageLocation> usageLocations
                         = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
                 usageLocations.forEach(loc -> {
-                    if (!propsDefs.containsKey(loc.getProperty())) {
+                    if (!definedProperties.containsKey(loc.getProperty())) {
                         log.debug("Property " + loc.getProperty() + " not defined.");
                         propertiesNotDefined.add(loc);
-                    }
-                });
-                if (definedPropertiesAreUsed) {
-                    final Collection<String> usagesTmp = Collections.emptySet();
-                    usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
-                    propsDefs.forEach((key, nrOf) -> {
-                        if (!usagesTmp.contains(key)) {
-                            propertiesNotUsed.add(key);
-                        }
-                    });
-                }
-            } else if (definedPropertiesAreUsed) {
-                final Collection<FileUsageLocation> usageLocations
-                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, propsDefs.keySet(), templates, sourceEncoding);
-                final Collection<String> usagesTmp = new HashSet<>();
-                usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
-                propsDefs.forEach((key, nrOf) -> {
-                    if (!usagesTmp.contains(key)) {
-                        propertiesNotUsed.add(key);
                     }
                 });
             }
@@ -300,6 +302,44 @@ public final class PropertyUsageRule implements EnforcerRule {
         return propertiesDefinedMoreThanOnce;
     }
 
+    public boolean isDefinedPropertiesAreUsed() {
+        return definedPropertiesAreUsed;
+    }
+
+    public void setDefinedPropertiesAreUsed(final boolean definedPropertiesAreUsed) {
+        this.definedPropertiesAreUsed = definedPropertiesAreUsed;
+    }
+
+    public boolean isUsedPropertiesAreDefined() {
+        return usedPropertiesAreDefined;
+    }
+
+    public void setUsedPropertiesAreDefined(final boolean usedPropertiesAreDefined) {
+        this.usedPropertiesAreDefined = usedPropertiesAreDefined;
+    }
+
+    public boolean isDefinitionsOnlyOnce() {
+        return definitionsOnlyOnce;
+    }
+
+    public void setDefinitionsOnlyOnce(final boolean definitionsOnlyOnce) {
+        this.definitionsOnlyOnce = definitionsOnlyOnce;
+    }
+
+    @Nonnull
+    public String getReplaceInTemplateWithPropertyName() {
+        return replaceInTemplateWithPropertyName;
+    }
+
+    public void setReplaceInTemplateWithPropertyName(@Nonnull final String replaceInTemplateWithPropertyName) {
+        this.replaceInTemplateWithPropertyName = replaceInTemplateWithPropertyName;
+    }
+
+    @Nonnull
+    public Collection<String> getDefinitions() {
+        return definitions;
+    }
+
     /**
      * Setters for the parameters
      * (these are not used by Maven Enforcer, used for testing).
@@ -309,59 +349,21 @@ public final class PropertyUsageRule implements EnforcerRule {
         this.definitions = definitions;
     }
 
-    public void setTemplates(@Nonnull final Collection<String> templates) {
-        this.templates = templates;
-    }
-
-    public void setUsages(@Nonnull Collection<String> usages) {
-        this.usages = usages;
-    }
-
-    public void setDefinedPropertiesAreUsed(final boolean definedPropertiesAreUsed) {
-        this.definedPropertiesAreUsed = definedPropertiesAreUsed;
-    }
-
-    public void setUsedPropertiesAreDefined(final boolean usedPropertiesAreDefined) {
-        this.usedPropertiesAreDefined = usedPropertiesAreDefined;
-    }
-
-    public void setDefinitionsOnlyOnce(final boolean definitionsOnlyOnce) {
-        this.definitionsOnlyOnce = definitionsOnlyOnce;
-    }
-
-    public void setReplaceInTemplateWithPropertyName(@Nonnull final String replaceInTemplateWithPropertyName) {
-        this.replaceInTemplateWithPropertyName = replaceInTemplateWithPropertyName;
-    }
-
-    public boolean isDefinedPropertiesAreUsed() {
-        return definedPropertiesAreUsed;
-    }
-
-    public boolean isUsedPropertiesAreDefined() {
-        return usedPropertiesAreDefined;
-    }
-
-    public boolean isDefinitionsOnlyOnce() {
-        return definitionsOnlyOnce;
-    }
-
-    @Nonnull
-    public String getReplaceInTemplateWithPropertyName() {
-        return replaceInTemplateWithPropertyName;
-    }
-
-    @Nonnull
-    public Collection<String> getDefinitions() {
-        return definitions;
-    }
-
     @Nonnull
     public Collection<String> getTemplates() {
         return templates;
     }
 
+    public void setTemplates(@Nonnull final Collection<String> templates) {
+        this.templates = templates;
+    }
+
     @Nonnull
     public Collection<String> getUsages() {
         return usages;
+    }
+
+    public void setUsages(@Nonnull Collection<String> usages) {
+        this.usages = usages;
     }
 }

@@ -9,7 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,26 +32,25 @@ class UsageFiles {
      * this is substituted with the property name.
      *
      * @param filenames  Collection of file names to search for property usage.
-     * @param properties Collection of property names to match against usages found.
-     * @param templates  Collection of templates (regexp) to use for matching.
-     * @return Map of usages not found and their .
+     * @param templatesAndProperties  Collection of templates (regexp) to use for matching, and their equivalent property.
+     * @return Map of usages not found and their location (file,row), though location does not matter here.
      */
     @SuppressWarnings({"squid:S134"})
     @Nonnull
     Set<FileUsageLocation> readDefinedUsagesFromFiles(
             @Nonnull final Collection<String> filenames,
-            @Nonnull final Collection<String> properties,
-            @Nonnull final Collection<String> templates,
+            //@Nonnull final Collection<String> properties,
+            @Nonnull final Map<String,String> templatesAndProperties,
             @Nonnull Charset charset)
             throws IOException {
         final Set<FileUsageLocation> results = new HashSet<>();
-        final ArrayList<Pattern> tplPatterns = new ArrayList<>();
-        //templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl)));
-        properties.forEach(prop -> tplPatterns.add(Pattern.compile("\"" + prop + "\"")));
+        final Map<Pattern,String> tplPatterns = new HashMap<>();
+        // Using Pattern.LITERAL, not very good. Should be fixed into something more sensible.
+        templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.LITERAL),property));
         for (String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
             Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);
-            tplPatterns.forEach(tplP -> {
+            tplPatterns.forEach((tplP, property) -> {
                 log.debug("    Matching pattern '" + tplP.pattern() + "'.");
                 int rowNr = 1;
                 for (String row : lines) {
@@ -57,8 +58,7 @@ class UsageFiles {
                     Matcher matcher = tplP.matcher(row);
                     if (matcher.find()) {
                         log.debug("        Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
-                        final String propname = tplP.pattern().replaceAll("\"", "");
-                        results.add(new FileUsageLocation(propname, rowNr, filename));
+                        results.add(new FileUsageLocation(property, rowNr, filename));
                     }
                     rowNr += 1;
                 }
@@ -70,7 +70,7 @@ class UsageFiles {
     /**
      * @param filenames Collection of file names to search for property usage.
      * @param templates Collection of templates (regexp) to use for matching.
-     * @return Map of usages not found and their .
+     * @return Map of usages not found and their location (file, row).
      */
     @Nonnull
     Set<FileUsageLocation> readAllUsagesFromFiles(
@@ -80,7 +80,7 @@ class UsageFiles {
             throws IOException {
         final Set<FileUsageLocation> results = new HashSet<>();
         final ArrayList<Pattern> tplPatterns = new ArrayList<>();
-        templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl)));
+        templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl, Pattern.LITERAL)));
         for (String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
             Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);

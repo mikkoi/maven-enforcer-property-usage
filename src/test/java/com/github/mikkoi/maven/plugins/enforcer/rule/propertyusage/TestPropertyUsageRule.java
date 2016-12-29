@@ -193,7 +193,24 @@ public final class TestPropertyUsageRule {
 //    }
 //
     @Test
-    public void testPropertyUsageRuleOk() {
+    public void testPropertyUsageRuleDefinedOk() {
+        testProps(
+                false,
+                true,
+                false,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1.properties")),
+                Collections.singleton("properties.getProperty(\"REPLACE_THIS\")"),
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleDefinedOk2() {
         testProps(
                 false,
                 true,
@@ -210,7 +227,27 @@ public final class TestPropertyUsageRule {
     }
 
     @Test
-    public void testPropertyUsageRuleFail() {
+    public void testPropertyUsageRuleDefinedOk3() {
+        final Collection<String> templates = new HashSet<>();
+        templates.add("properties.getProperty(\"REPLACE_THIS\")");
+        templates.add("${REPLACE_THIS}");
+        testProps(
+                false,
+                true,
+                false,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1.properties")),
+                templates,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleDefinedFail1() {
         final Collection<String> propertiesNotUsed = new HashSet<>();
         propertiesNotUsed.add("my-too.property.value");
         propertiesNotUsed.add("other-too.prop.val");
@@ -226,6 +263,106 @@ public final class TestPropertyUsageRule {
                 Collections.emptySet(),
                 propertiesNotUsed,
                 Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleDefinedFail2() {
+        final Collection<String> templates = new HashSet<>();
+        templates.add("properties.getProperty(\"REPLACE_THIS\")");
+        templates.add("${REPLACE_THIS}");
+        final Collection<String> propertiesNotUsed = new HashSet<>();
+        propertiesNotUsed.add("my-too.property.value");
+        propertiesNotUsed.add("other-too.prop.val");
+        testProps(
+                false,
+                true,
+                false,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                templates,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                false,
+                Collections.emptySet(),
+                propertiesNotUsed,
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleUsedOk1() {
+        testProps(
+                false,
+                false,
+                true,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app1.properties")),
+                Collections.singleton("properties.getProperty(\"REPLACE_THIS\")"),
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App1.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleUsedOk2() {
+        testProps(
+                false,
+                false,
+                true,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleUsedFail2() {
+        final Collection<String> propertiesNotDefined = new HashSet<>();
+        propertiesNotDefined.add("my-too.property.value");
+        propertiesNotDefined.add("other-too.prop.val");
+        testProps(
+                false,
+                false,
+                true,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                propertiesNotDefined
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleUsedFail3() {
+        final Collection<String> templates = new HashSet<>();
+        templates.add("properties.getProperty(\"(REPLACE_THIS)\")");
+        templates.add("${(REPLACE_THIS)}");
+        final Collection<String> propertiesNotDefined = new HashSet<>();
+        propertiesNotDefined.add("my-too.property.value");
+        propertiesNotDefined.add("other-too.prop.val");
+        testProps(
+                false,
+                false,
+                true,
+                null,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                templates,
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                propertiesNotDefined
         );
     }
 

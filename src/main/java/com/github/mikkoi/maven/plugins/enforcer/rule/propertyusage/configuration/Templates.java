@@ -16,7 +16,7 @@ public class Templates {
     @Nonnull
     public static Collection<String> getDefault() {
         return Collections.singleton(
-                "\"(REPLACE_THIS+)\""
+                "\"(REPLACE_THIS)\""
 //                "\"(\\S+)\""
 //                "\"my.property.value\""
         );
