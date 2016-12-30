@@ -176,22 +176,25 @@ public final class PropertyUsageRule implements EnforcerRule {
                         )
                 );
                 log.debug("readyTemplates:" + readyTemplates);
-                final Collection<FileUsageLocation> usageLocations
+                final Collection<String> usedProperties
                         = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
-                final Collection<String> usagesTmp = new HashSet<>();
-                usageLocations.forEach(loc -> usagesTmp.add(loc.getProperty()));
                 definedProperties.forEach((key, nrOf) -> {
-                    if (!usagesTmp.contains(key)) {
+                    if (!usedProperties.contains(key)) {
                         propertiesNotUsed.add(key);
                     }
                 });
             }
             if (usedPropertiesAreDefined) {
-                final Collection<String> readyTemplates = new HashSet<>();
-                templates.forEach(tpl -> readyTemplates.add(
-                        tpl.replaceAll(replaceInTemplateWithPropertyName, "\\[a-z\\.]\\{1,\\}")
+                final Map<String,String> readyTemplates = new HashMap<>();
+                templates.forEach(tpl -> definedProperties.forEach(
+                        (propertyDefinition, nrPropertyDefinitions) ->
+                                readyTemplates.put(
+                                        tpl.replaceAll(replaceInTemplateWithPropertyName, "[a-z\\-\\.]{1,}?"),
+                                        propertyDefinition
+                                )
                         )
                 );
+                log.debug("readyTemplates:" + readyTemplates);
                 final Collection<FileUsageLocation> usageLocations
                         = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
                 usageLocations.forEach(loc -> {

@@ -346,8 +346,8 @@ public final class TestPropertyUsageRule {
     @Test
     public void testPropertyUsageRuleUsedFail3() {
         final Collection<String> templates = new HashSet<>();
-        templates.add("properties.getProperty(\"(REPLACE_THIS)\")");
-        templates.add("${(REPLACE_THIS)}");
+        templates.add("properties.getProperty\\(\"(REPLACE_THIS)\"\\)");
+        templates.add("\\$\\{(REPLACE_THIS)\\}");
         final Collection<String> propertiesNotDefined = new HashSet<>();
         propertiesNotDefined.add("my-too.property.value");
         propertiesNotDefined.add("other-too.prop.val");
@@ -359,7 +359,7 @@ public final class TestPropertyUsageRule {
                 Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
                 templates,
                 Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
-                true,
+                false,
                 Collections.emptySet(),
                 Collections.emptySet(),
                 propertiesNotDefined
