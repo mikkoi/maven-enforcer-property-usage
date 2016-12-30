@@ -37,13 +37,13 @@ class UsageFiles {
 //     */
 //    @SuppressWarnings({"squid:S134"})
 //    @Nonnull
-//    Set<FileUsageLocation> readDefinedUsagesFromFiles(
+//    Set<UsageLocation> readDefinedUsagesFromFiles(
 //            @Nonnull final Collection<String> filenames,
 //            //@Nonnull final Collection<String> properties,
 //            @Nonnull final Map<String,String> templatesAndProperties,
 //            @Nonnull Charset charset)
 //            throws IOException {
-//        final Set<FileUsageLocation> results = new HashSet<>();
+//        final Set<UsageLocation> results = new HashSet<>();
 //        final Map<Pattern,String> tplPatterns = new HashMap<>();
 //        // Using Pattern.LITERAL, not very good. Should be fixed into something more sensible.
 //        templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.LITERAL),property));
@@ -58,7 +58,7 @@ class UsageFiles {
 //                    Matcher matcher = tplP.matcher(row);
 //                    if (matcher.find()) {
 //                        log.debug("        Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
-//                        results.add(new FileUsageLocation(property, rowNr, filename));
+//                        results.add(new UsageLocation(property, rowNr, filename));
 //                    }
 //                    rowNr += 1;
 //                }
@@ -104,18 +104,19 @@ class UsageFiles {
 
     /**
      * @param filenames Collection of file names to search for property usage.
-     * @param templatesAndProperties Map of templates (regexp) and prop names to use for matching.
+     * @param templates Map of templates (regexp) to use for matching,
+     *                  can be used to separate proper usage patterns for properties.
      * @return Map of usages not found and their location (file, row).
      */
     @Nonnull
-    Set<FileUsageLocation> readAllUsagesFromFiles(
+    Set<UsageLocation> readAllUsagesFromFiles(
             @Nonnull final Collection<String> filenames,
-            @Nonnull final Map<String,String> templatesAndProperties,
-            @Nonnull Charset charset)
+            @Nonnull final Set<String> templates,
+            @Nonnull final Charset charset)
             throws IOException {
-        final Set<FileUsageLocation> results = new HashSet<>();
+        final Set<UsageLocation> foundProperties = new HashSet<>();
         final ArrayList<Pattern> tplPatterns = new ArrayList<>();
-        templatesAndProperties.forEach((tpl,prop) -> tplPatterns.add(Pattern.compile(tpl)));
+        templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl)));
         for (String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
             Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);
@@ -126,28 +127,29 @@ class UsageFiles {
                     log.debug("        Matching with row '" + row + "'.");
                     Matcher matcher = tplP.matcher(row);
                     if (matcher.find()) {
-                        log.debug("        Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
-                        final String propname = matcher.group();
-                        results.add(new FileUsageLocation(propname, rowNr, filename));
+                        log.debug("            Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
+                        final String propname = matcher.group(1);
+                        log.debug("            Extracted property '" + propname + "'.");
+                        foundProperties.add(new UsageLocation(propname, rowNr, filename));
                     }
                     rowNr += 1;
                 }
             });
         }
-        return results;
+        return foundProperties;
     }
 
-    class FileUsageLocation {
-        String property;
-        int row;
-        String filename;
+    class UsageLocation {
+        private String property;
+        private int row;
+        private String filename;
 
         /**
          * @param property Property name
          * @param row      number
          * @param filename Name of file
          */
-        FileUsageLocation(@Nonnull final String property, final int row, final String filename) {
+        UsageLocation(@Nonnull final String property, final int row, final String filename) {
             this.property = property;
             this.row = row;
             this.filename = filename;
@@ -162,6 +164,7 @@ class UsageFiles {
             return row;
         }
 
+        @Nonnull
         public String getFilename() {
             return filename;
         }

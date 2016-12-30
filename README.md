@@ -61,7 +61,7 @@ Add the following to your project's `pom.xml` file:
                             </usages>
                         </enforceProperties>
                     </rules>
-                    <!-- Fail build if wrong encoding encountered. -->
+                    <!-- Fail build if rules broken. -->
                     <fail>true</fail>
                 </configuration>
             </execution>

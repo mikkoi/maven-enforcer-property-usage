@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -148,9 +149,9 @@ public final class TestPropertyUsageRule {
         }
         assertTrue(isValid == expected);
         assertTrue(rule.getPropertiesNotUsed().equals(propertiesNotUsed));
-        final Set<String> resultPropertiesNodDefined = new HashSet<>();
-        rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNodDefined.add(val.getProperty()));
-        assertTrue(resultPropertiesNodDefined.equals(propertiesNotDefined));
+        final Set<String> resultPropertiesNotDefined = new HashSet<>();
+        rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNotDefined.add(val.getProperty()));
+        assertTrue(resultPropertiesNotDefined.equals(propertiesNotDefined));
         assertTrue(rule.getPropertiesDefinedMoreThanOnce().keySet().equals(propertiesDefinedMoreThanOnce));
     }
 
@@ -325,9 +326,6 @@ public final class TestPropertyUsageRule {
 
     @Test
     public void testPropertyUsageRuleUsedFail2() {
-        final Collection<String> propertiesNotDefined = new HashSet<>();
-        propertiesNotDefined.add("my-too.property.value");
-        propertiesNotDefined.add("other-too.prop.val");
         testProps(
                 false,
                 false,
@@ -339,26 +337,27 @@ public final class TestPropertyUsageRule {
                 true,
                 Collections.emptySet(),
                 Collections.emptySet(),
-                propertiesNotDefined
+                Collections.emptySet()
         );
     }
 
     @Test
     public void testPropertyUsageRuleUsedFail3() {
         final Collection<String> templates = new HashSet<>();
-        templates.add("properties.getProperty\\(\"(REPLACE_THIS)\"\\)");
-        templates.add("\\$\\{(REPLACE_THIS)\\}");
-        final Collection<String> propertiesNotDefined = new HashSet<>();
-        propertiesNotDefined.add("my-too.property.value");
-        propertiesNotDefined.add("other-too.prop.val");
+        templates.add("properties.getProperty\\(\"REPLACE_THIS\"\\)");
+        templates.add("\\$\\{REPLACE_THIS\\}");
+        Collection<String> propertiesNotDefined = new HashSet<>();
+        propertiesNotDefined.add("my-second.prop.val");
+        propertiesNotDefined.add("my-first.property.value");
+        propertiesNotDefined.add("my-third-val");
         testProps(
                 false,
                 false,
                 true,
                 null,
-                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/app2.properties")),
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/resources/empty.properties")),
                 templates,
-                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
+                Collections.singleton(Files.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App3.java")),
                 false,
                 Collections.emptySet(),
                 Collections.emptySet(),
@@ -385,7 +384,7 @@ public final class TestPropertyUsageRule {
         assertEquals("Default usedPropertiesAreDefined is true", true, rule.isUsedPropertiesAreDefined());
         assertEquals("Default replaceInTemplateWithPropertyName is correct", "REPLACE_THIS", rule.getReplaceInTemplateWithPropertyName());
         assertEquals("Default definitions are correct", Collections.singleton(Files.absoluteCwdAndFile("src/main/resources")), rule.getDefinitions());
-        assertEquals("Default templates are correct", Collections.singleton("\"(REPLACE_THIS+)\""), rule.getTemplates());
+        assertEquals("Default templates are correct", Collections.singleton("\"REPLACE_THIS\""), rule.getTemplates());
         assertEquals("Default usages are correct", Collections.singleton(Files.absoluteCwdAndFile("src/main/java")), rule.getUsages());
     }
 }

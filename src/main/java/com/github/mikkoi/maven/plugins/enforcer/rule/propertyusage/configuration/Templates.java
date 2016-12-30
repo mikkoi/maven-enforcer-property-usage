@@ -6,29 +6,30 @@ import java.util.Collections;
 
 public class Templates {
 
+    /**
+     * Replace template property name placeholder with this when searching for properties.
+     */
+    public static final String PROPERTY_NAME_REGEXP = "([a-z\\-\\.]{1,}?)";
+
+    /**
+     * Default property name placeholder string to replace in template.
+     */
+    public static final String DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME = "REPLACE_THIS";
+
     private Templates() {
     }
 
     /**
      * Get Default value
+     *
      * @return collection of strings
      */
     @Nonnull
     public static Collection<String> getDefault() {
         return Collections.singleton(
-                "\"(REPLACE_THIS)\""
-//                "\"(\\S+)\""
-//                "\"my.property.value\""
+                "\"REPLACE_THIS\""
         );
     }
 
-    /**
-     * Get Default value
-     * @return default string to replace in template
-     */
-    @Nonnull
-    public static String getDefaultReplaceInTemplateWithPropertyName() {
-        return "REPLACE_THIS";
-    }
 }
 

@@ -19,7 +19,7 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
  * under the License.
  */
 
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.FileUsageLocation;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.UsageLocation;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Files;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
@@ -63,7 +63,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Properties which were used in usages but not defined in definitions.
      */
     @Nonnull
-    private final Set<FileUsageLocation> propertiesNotDefined = new HashSet<>();
+    private final Set<UsageFiles.UsageLocation> propertiesNotDefined = new HashSet<>();
 
     /**
      * Logger given by Maven Enforcer.
@@ -71,7 +71,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     Log log = null;
 
     //
-    // Following variables match the configuration items and are populated by Enforcer,
+    // Following variables match the configuration items and are populated by Maven/Enforcer,
     // despite being private.
     //
 
@@ -94,7 +94,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Replace this string with property name in template(s).
      */
     @Nonnull
-    private String replaceInTemplateWithPropertyName = Templates.getDefaultReplaceInTemplateWithPropertyName();
+    private String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
 
     /**
      * Definitions
@@ -148,10 +148,10 @@ public final class PropertyUsageRule implements EnforcerRule {
             Map<String, Integer> definedProperties;
             if (definitionsOnlyOnce) {
                 definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithCount(propertyFilenames);
-                definedProperties.forEach((key, value) -> {
-                    log.debug("Property '" + key + "' defined " + value + " times.");
-                    if (value > 1) {
-                        this.propertiesDefinedMoreThanOnce.put(key, value);
+                definedProperties.forEach((prop, nrOf) -> {
+                    log.debug("Property '" + prop + "' defined " + nrOf + " times.");
+                    if (nrOf > 1) {
+                        propertiesDefinedMoreThanOnce.put(prop, nrOf);
                     }
                 });
             } else {
@@ -178,29 +178,28 @@ public final class PropertyUsageRule implements EnforcerRule {
                 log.debug("readyTemplates:" + readyTemplates);
                 final Collection<String> usedProperties
                         = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
-                definedProperties.forEach((key, nrOf) -> {
-                    if (!usedProperties.contains(key)) {
-                        propertiesNotUsed.add(key);
+                definedProperties.forEach((prop, nrOf) -> {
+                    if (!usedProperties.contains(prop)) {
+                        log.debug("Property " + prop + " not used.");
+                        propertiesNotUsed.add(prop);
                     }
                 });
             }
             if (usedPropertiesAreDefined) {
-                final Map<String,String> readyTemplates = new HashMap<>();
-                templates.forEach(tpl -> definedProperties.forEach(
-                        (propertyDefinition, nrPropertyDefinitions) ->
-                                readyTemplates.put(
-                                        tpl.replaceAll(replaceInTemplateWithPropertyName, "[a-z\\-\\.]{1,}?"),
-                                        propertyDefinition
-                                )
+                final Set<String> readyTemplates = new HashSet<>();
+                templates.forEach(tpl -> readyTemplates.add(
+                                        tpl.replaceAll(replaceInTemplateWithPropertyName, Templates.PROPERTY_NAME_REGEXP)
                         )
                 );
                 log.debug("readyTemplates:" + readyTemplates);
-                final Collection<FileUsageLocation> usageLocations
+                final Collection<UsageLocation> usageLocations
                         = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
                 usageLocations.forEach(loc -> {
                     if (!definedProperties.containsKey(loc.getProperty())) {
                         log.debug("Property " + loc.getProperty() + " not defined.");
                         propertiesNotDefined.add(loc);
+                    } else {
+                        log.debug("Property " + loc.getProperty() + " defined.");
                     }
                 });
             }
@@ -227,7 +226,7 @@ public final class PropertyUsageRule implements EnforcerRule {
         if (usedPropertiesAreDefined) {
             propertiesNotDefined.forEach(loc ->
                     log.error("Property " + loc.getProperty() + " used without defining it ("
-                            + loc.filename + ":" + loc.getRow() + ")"));
+                            + loc.getFilename() + ":" + loc.getRow() + ")"));
         }
 
         // Fail rule if errors in wanted categories.
@@ -296,7 +295,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     @Nonnull
-    public Set<FileUsageLocation> getPropertiesNotDefined() {
+    public Set<UsageFiles.UsageLocation> getPropertiesNotDefined() {
         return propertiesNotDefined;
     }
 
