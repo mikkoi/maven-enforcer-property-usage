@@ -706,7 +706,7 @@
                             <xmlOutput>true</xmlOutput>
                             <!-- Configures the directory in which the XML report is created -->
                             <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
-                            <!--<excludeFilterFile>${project.basedir}/findbugs-exclude.xml</excludeFilterFile>-->
+                            <excludeFilterFile>${project.basedir}/findbugs-exclude.xml</excludeFilterFile>
                         </configuration>
                         <executions>
                             <!-- Ensures that FindBugs inspects source code when project is compiled. -->
@@ -732,6 +732,7 @@
                             </excludes>
                             <excludeRoots>
                             </excludeRoots>
+                            <failOnViolation>false</failOnViolation>
                         </configuration>
                         <executions>
                             <execution>

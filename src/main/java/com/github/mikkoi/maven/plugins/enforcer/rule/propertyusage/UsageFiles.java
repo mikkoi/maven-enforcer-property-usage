@@ -35,23 +35,22 @@ class UsageFiles {
      * @param templatesAndProperties  Collection of templates (regexp) to use for matching, and their equivalent property.
      * @return Map of usages not found and their location (file,row), though location does not matter here.
      */
-    @SuppressWarnings({"squid:S134"})
     @Nonnull
     Set<String> readDefinedUsagesFromFiles(
             @Nonnull final Collection<String> filenames,
             @Nonnull final Map<String,String> templatesAndProperties,
-            @Nonnull Charset charset)
+            @Nonnull final Charset charset)
             throws IOException {
         final Set<String> results = new HashSet<>();
         final Map<Pattern,String> tplPatterns = new HashMap<>();
         templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS),property));
-        for (String filename : filenames) {
+        for (final String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
-            String allFile = String.join("", Files.readAllLines(Paths.get(filename), charset));
+            final String allFile = String.join("", Files.readAllLines(Paths.get(filename), charset));
             tplPatterns.forEach((tplP, property) -> {
                 log.debug("    Matching pattern '" + tplP.pattern() + "'.");
                 log.debug("        Matching with allFile '" + allFile + "'.");
-                Matcher matcher = tplP.matcher(allFile);
+                final Matcher matcher = tplP.matcher(allFile);
                 if (matcher.find()) {
                     log.debug("        Pattern match found (" + filename + ")" + ", pattern '" + tplP.pattern() + "'.");
                     results.add(property);
@@ -76,15 +75,15 @@ class UsageFiles {
         final Set<UsageLocation> foundProperties = new HashSet<>();
         final ArrayList<Pattern> tplPatterns = new ArrayList<>();
         templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS)));
-        for (String filename : filenames) {
+        for (final String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
-            Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);
+            final Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);
             tplPatterns.forEach(tplP -> {
                 log.debug("    Matching pattern '" + tplP.pattern() + "'.");
                 int rowNr = 1;
-                for (String row : lines) {
+                for (final String row : lines) {
                     log.debug("        Matching with row '" + row + "'.");
-                    Matcher matcher = tplP.matcher(row);
+                    final Matcher matcher = tplP.matcher(row);
                     if (matcher.find()) {
                         log.debug("            Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
                         final String propname = matcher.group(1);
@@ -99,19 +98,24 @@ class UsageFiles {
     }
 
     static class UsageLocation {
+
+        @Nonnull
         private String property;
+
         private int row;
+
+        @Nonnull
         private String filename;
 
         /**
-         * @param property Property name
-         * @param row      number
-         * @param filename Name of file
+         * @param propertyVal Property name
+         * @param rowVal      number
+         * @param filenameVal Name of file
          */
-        UsageLocation(@Nonnull final String property, final int row, final String filename) {
-            this.property = property;
-            this.row = row;
-            this.filename = filename;
+        UsageLocation(@Nonnull final String propertyVal, final int rowVal, @Nonnull final String filenameVal) {
+            property = propertyVal;
+            row = rowVal;
+            filename = filenameVal;
         }
 
         @Nonnull
