@@ -26,9 +26,7 @@ public class Templates {
      */
     @Nonnull
     public static Collection<String> getDefault() {
-        return Collections.singleton(
-                "\"REPLACE_THIS\""
-        );
+        return Collections.singleton("\"" + DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME + "\"");
     }
 
 }

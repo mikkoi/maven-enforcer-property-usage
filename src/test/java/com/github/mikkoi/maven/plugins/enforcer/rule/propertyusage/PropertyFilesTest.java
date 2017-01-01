@@ -21,10 +21,12 @@ public class PropertyFilesTest {
         Map<String, Integer> expected = Maps.newHashMap();
         expected.put("my.property.value", 1);
         expected.put("other.prop.val", 1);
-        expected.put("my-too.property.value", 2);
-        expected.put("other-too.prop.val", 1);
-        expected.put("other-three.prop.val", 1);
         expected.put("my-too.property.value", 1);
+        expected.put("other-too.prop.val", 1);
+        expected.put("also-prop.val", 1);
+        expected.put("my-first.property.value", 1);
+        expected.put("my-second.prop.val", 1);
+        expected.put("my-third-val", 1);
         Collection<String> filenames = Arrays.asList(
                 "src/test/resources/app1.properties",
                 "src/test/resources/app2.properties",

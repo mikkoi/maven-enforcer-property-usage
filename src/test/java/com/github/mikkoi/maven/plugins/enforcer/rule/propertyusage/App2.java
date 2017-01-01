@@ -10,7 +10,7 @@ public class App2 {
 
     public Integer value2 = 0x0;
 
-    public double value3 = Double.valueOf("${}");
+    public double value3 = Double.valueOf("${also-prop.val}");
 
     public App2() {
         Properties properties = new Properties();

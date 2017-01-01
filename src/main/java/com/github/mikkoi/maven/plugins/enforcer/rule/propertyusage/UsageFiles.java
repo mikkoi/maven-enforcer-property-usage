@@ -49,7 +49,7 @@ class UsageFiles {
 //        templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.LITERAL),property));
 //        for (String filename : filenames) {
 //            log.debug("Reading file '" + filename + "'.");
-//            Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);
+//            Collection<String> lines = FileSpecs.readAllLines(Paths.get(filename), charset);
 //            tplPatterns.forEach((tplP, property) -> {
 //                log.debug("    Matching pattern '" + tplP.pattern() + "'.");
 //                int rowNr = 1;
@@ -84,8 +84,7 @@ class UsageFiles {
             throws IOException {
         final Set<String> results = new HashSet<>();
         final Map<Pattern,String> tplPatterns = new HashMap<>();
-        // Using Pattern.LITERAL, not very good. Should be fixed into something more sensible.
-        templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.LITERAL),property));
+        templatesAndProperties.forEach((tpl,property) -> tplPatterns.put(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS),property));
         for (String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
             String allFile = String.join("", Files.readAllLines(Paths.get(filename), charset));
@@ -116,7 +115,7 @@ class UsageFiles {
             throws IOException {
         final Set<UsageLocation> foundProperties = new HashSet<>();
         final ArrayList<Pattern> tplPatterns = new ArrayList<>();
-        templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl)));
+        templates.forEach(tpl -> tplPatterns.add(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS)));
         for (String filename : filenames) {
             log.debug("Reading file '" + filename + "'.");
             Collection<String> lines = Files.readAllLines(Paths.get(filename), charset);

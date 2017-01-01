@@ -21,7 +21,7 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.UsageLocation;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
-import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Files;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
@@ -29,11 +29,14 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +49,11 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("WeakerAccess")
 public final class PropertyUsageRule implements EnforcerRule {
+
+    /**
+     * Default character set for all files to read.
+     */
+    @Nonnull private final Charset DEFAULT_CHAR_SET = Charset.forName("UTF-8");
 
     /**
      * Properties which were defined more than once.
@@ -74,6 +82,16 @@ public final class PropertyUsageRule implements EnforcerRule {
     // Following variables match the configuration items and are populated by Maven/Enforcer,
     // despite being private.
     //
+
+    /**
+     * Character encoding for source (usage) files.
+     */
+    private String sourceEncoding = DEFAULT_CHAR_SET.toString();
+
+    /**
+     * Character encoding for properties files.
+     */
+    private String propertiesEncoding = DEFAULT_CHAR_SET.toString();
 
     /**
      * Activate definitionsOnlyOnce
@@ -126,23 +144,43 @@ public final class PropertyUsageRule implements EnforcerRule {
             throws EnforcerRuleException {
         log = helper.getLog();
 
-        Charset sourceEncoding = Charset.forName("UTF-8");
+        Path basedir = Paths.get("");
         try {
-            sourceEncoding = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+            basedir = Paths.get(helper.evaluate("${project.basedir}").toString());
+        } catch (ExpressionEvaluationException | NullPointerException e) {
+            log.error("Cannot get property 'project.basedir'. Using current working directory. Error:" + e);
+        }
+
+        Charset propertiesEnc = DEFAULT_CHAR_SET;
+        Charset sourceEnc = DEFAULT_CHAR_SET;
+        try {
+            if(StringUtils.isNotBlank(propertiesEncoding)) {
+                propertiesEnc = Charset.forName(propertiesEncoding);
+            } else {
+                propertiesEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+            }
+            if(StringUtils.isNotBlank(sourceEncoding)) {
+                sourceEnc = Charset.forName(sourceEncoding);
+            } else {
+                sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+            }
         } catch (ExpressionEvaluationException | NullPointerException e) {
             log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
         }
 
-        log.debug("PropertyUsageRule:execute");
-        log.debug(definitions.toString());
-        log.debug(templates.toString());
-        log.debug(usages.toString());
+        log.debug("PropertyUsageRule:execute() - Settings:");
+        log.debug("propertiesEnc:" + propertiesEnc.toString());
+        log.debug("sourceEnc:" + sourceEnc.toString());
+        log.debug("replaceInTemplateWithPropertyName:" + replaceInTemplateWithPropertyName);
+        log.debug("definitions:" + definitions.toString());
+        log.debug("templates:" + templates.toString());
+        log.debug("usages:" + usages.toString());
 
         try {
+            log.debug("PropertyUsageRule:execute() - Run:");
             // Get property definitions (i.e. property names):
-            // Get all the files to read for the properties definitions.
-            Files files = new Files(log);
-            final Collection<String> propertyFilenames = files.getAbsoluteFilenames(definitions)
+            // Get all the fileSpecs to read for the properties definitions.
+            final Collection<String> propertyFilenames = FileSpecs.getAbsoluteFilenames(definitions, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
             // Get the property definitions and how many times they are defined.
             Map<String, Integer> definedProperties;
@@ -158,14 +196,15 @@ public final class PropertyUsageRule implements EnforcerRule {
                 definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithoutCount(propertyFilenames);
             }
 
-            // Get all the files to check for property usage. *.java, *.jsp, etc.
-            final Collection<String> usageFilenames = files.getAbsoluteFilenames(usages)
+            // Get all the fileSpecs to check for property usage. Normally **/*.java, maybe **/*.jsp, etc.
+            final Collection<String> usageFilenames = FileSpecs.getAbsoluteFilenames(usages, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
 
-            // Iterate through files and collect property usage.
+            // Iterate through fileSpecs and collect property usage.
             // Iterate
             UsageFiles usageFiles = new UsageFiles(log);
             if (definedPropertiesAreUsed) {
+                log.debug("definedPropertiesAreUsed");
                 final Map<String,String> readyTemplates = new HashMap<>();
                 templates.forEach(tpl -> definedProperties.forEach(
                         (propertyDefinition, nrPropertyDefinitions) ->
@@ -177,7 +216,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                 );
                 log.debug("readyTemplates:" + readyTemplates);
                 final Collection<String> usedProperties
-                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
+                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEnc);
                 definedProperties.forEach((prop, nrOf) -> {
                     if (!usedProperties.contains(prop)) {
                         log.debug("Property " + prop + " not used.");
@@ -186,6 +225,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                 });
             }
             if (usedPropertiesAreDefined) {
+                log.debug("usedPropertiesAreDefined");
                 final Set<String> readyTemplates = new HashSet<>();
                 templates.forEach(tpl -> readyTemplates.add(
                                         tpl.replaceAll(replaceInTemplateWithPropertyName, Templates.PROPERTY_NAME_REGEXP)
@@ -193,7 +233,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                 );
                 log.debug("readyTemplates:" + readyTemplates);
                 final Collection<UsageLocation> usageLocations
-                        = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEncoding);
+                        = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEnc);
                 usageLocations.forEach(loc -> {
                     if (!definedProperties.containsKey(loc.getProperty())) {
                         log.debug("Property " + loc.getProperty() + " not defined.");
@@ -213,19 +253,19 @@ public final class PropertyUsageRule implements EnforcerRule {
         // propertiesDefinedMoreThanOnce
         if (definitionsOnlyOnce) {
             propertiesDefinedMoreThanOnce.forEach((key, value) ->
-                    log.error("Property " + key + " defined " + value + " times!")
+                    log.error("Property '" + key + "' defined " + value + " times!")
             );
         }
         // propertiesNotUsed
         if (definedPropertiesAreUsed) {
             propertiesNotUsed.forEach(key ->
-                    log.error("Property " + key + " not used!")
+                    log.error("Property '" + key + "' not used!")
             );
         }
         // propertiesNotDefined
         if (usedPropertiesAreDefined) {
             propertiesNotDefined.forEach(loc ->
-                    log.error("Property " + loc.getProperty() + " used without defining it ("
+                    log.error("Property '" + loc.getProperty() + "' used without defining it ("
                             + loc.getFilename() + ":" + loc.getRow() + ")"));
         }
 
