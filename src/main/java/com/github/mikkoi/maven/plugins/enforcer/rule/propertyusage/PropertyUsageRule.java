@@ -185,7 +185,7 @@ public final class PropertyUsageRule implements EnforcerRule {
             // Get the property definitions and how many times they are defined.
             Map<String, Integer> definedProperties;
             if (definitionsOnlyOnce) {
-                definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithCount(propertyFilenames);
+                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithCount(propertyFilenames);
                 definedProperties.forEach((prop, nrOf) -> {
                     log.debug("Property '" + prop + "' defined " + nrOf + " times.");
                     if (nrOf > 1) {
@@ -193,7 +193,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                     }
                 });
             } else {
-                definedProperties = new PropertyFiles(log).readPropertiesFromFilesWithoutCount(propertyFilenames);
+                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithoutCount(propertyFilenames);
             }
 
             // Get all the fileSpecs to check for property usage. Normally **/*.java, maybe **/*.jsp, etc.

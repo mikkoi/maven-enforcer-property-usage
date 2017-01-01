@@ -346,8 +346,11 @@ public final class TestPropertyUsageRule {
         propertiesNotUsed.add("subapp.my2.property.value");
         propertiesNotUsed.add("subapp.my.property.value");
         propertiesNotUsed.add("subapp.other2.prop.val");
-        propertiesNotUsed.add("other.property.value");
         propertiesNotUsed.add("very-temporary-property.value");
+        propertiesNotUsed.add("first.property.value");
+        propertiesNotUsed.add("second.property.value");
+        propertiesNotUsed.add("fourth.property.value");
+
         testProps(
                 false,
                 true,
