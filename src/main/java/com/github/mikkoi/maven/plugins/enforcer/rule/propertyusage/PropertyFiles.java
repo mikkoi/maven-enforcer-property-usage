@@ -36,7 +36,6 @@ class PropertyFiles {
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and how many times they are defined.
      */
-    @SuppressWarnings("squid:S134")
     @Nonnull
     Map<String, Integer> readPropertiesFromFilesWithoutCount(@Nonnull final Collection<String> filenames)
             throws IOException {
@@ -57,12 +56,17 @@ class PropertyFiles {
     }
 
     /**
-     * TODO Fix this function.
+     * Read properties with our own reading routine and count
+     * how many times they are used.
      *
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and how many times they are defined.
      */
-    @SuppressWarnings("squid:S134")
+    @SuppressWarnings({
+            "squid:S3776", // Cognitive Complexity of methods should not be too high
+            "squid:S134",  // Control flow statements "if", "for", "while", "switch" and "try" should not be nested too deeply
+            "squid:S135"   // Loops should not contain more than a single "break" or "continue" statement
+    })
     @Nonnull
     Map<String, Integer> readPropertiesFromFilesWithCount(@Nonnull final Collection<String> filenames)
             throws IOException {

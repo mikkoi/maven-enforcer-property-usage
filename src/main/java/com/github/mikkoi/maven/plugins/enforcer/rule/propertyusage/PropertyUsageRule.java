@@ -53,7 +53,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     /**
      * Default character set for all files to read.
      */
-    @Nonnull private final Charset DEFAULT_CHAR_SET = Charset.forName("UTF-8");
+    private static final Charset DEFAULT_CHAR_SET = Charset.forName("UTF-8");
 
     /**
      * Properties which were defined more than once.
@@ -136,8 +136,10 @@ public final class PropertyUsageRule implements EnforcerRule {
      */
     @Override
     @SuppressWarnings({
-            "squid:S1067", // Expressions should not be too complex
-            "squid:S1192"  // String literals should not be duplicated
+            "squid:S3776",  // Cognitive Complexity of methods should not be too high
+            "squid:S1067",  // Expressions should not be too complex
+            "squid:S1192",  // String literals should not be duplicated
+            "squid:MethodCyclomaticComplexity"
     })
     //@SuppressWarnings("squid:S1192")
     public void execute(@Nonnull final EnforcerRuleHelper helper)

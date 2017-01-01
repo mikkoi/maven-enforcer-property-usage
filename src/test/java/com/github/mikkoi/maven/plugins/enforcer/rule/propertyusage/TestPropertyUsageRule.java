@@ -88,43 +88,43 @@ public final class TestPropertyUsageRule {
     }
 
     // Implement feature first.
-//    @Test
-//    public void testPropertyUsageRuleDefinitionsOnlyOnceFail() {
-//        final Collection<String> propertiesDefinedMoreThanOnce = new HashSet<>();
-//        propertiesDefinedMoreThanOnce.add("my.property.value");
-//        propertiesDefinedMoreThanOnce.add("third.property.value");
-//        testProps(
-//                true,
-//                false,
-//                false,
-//                null,
-//                Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/resources/app1-double-def.properties")),
-//                null,
-//                null,
-//                false,
-//                propertiesDefinedMoreThanOnce,
-//                Collections.emptySet(),
-//                Collections.emptySet()
-//        );
-//    }
-//
-//    @Test
-//    public void testPropertyUsageRuleDefinitionsOnlyOnceOk() {
-//        testProps(
-//                true,
-//                false,
-//                false,
-//                null,
-//                Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/resources/app1.properties")),
-//                null,
-//                null,
-//                true,
-//                Collections.emptySet(),
-//                Collections.emptySet(),
-//                Collections.emptySet()
-//        );
-//    }
-//
+    @Test
+    public void testPropertyUsageRuleDefinitionsOnlyOnceFail() {
+        final Collection<String> propertiesDefinedMoreThanOnce = new HashSet<>();
+        propertiesDefinedMoreThanOnce.add("first.property.value");
+        propertiesDefinedMoreThanOnce.add("third.property.value");
+        testProps(
+                true,
+                false,
+                false,
+                null,
+                Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/resources/app1-double-def.properties")),
+                null,
+                null,
+                false,
+                propertiesDefinedMoreThanOnce,
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
+    @Test
+    public void testPropertyUsageRuleDefinitionsOnlyOnceOk() {
+        testProps(
+                true,
+                false,
+                false,
+                null,
+                Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/resources/app1.properties")),
+                null,
+                null,
+                true,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
+    }
+
     @Test
     public void testPropertyUsageRuleDefinedOk() {
         testProps(
