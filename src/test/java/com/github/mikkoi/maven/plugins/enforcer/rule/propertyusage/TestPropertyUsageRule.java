@@ -243,13 +243,16 @@ public final class TestPropertyUsageRule {
 
     @Test
     public void testPropertyUsageRuleUsedOk2() {
+        final Collection<String> templates = new HashSet<>();
+        templates.add("properties\\.getProperty\\(\"REPLACE_THIS\"\\)");
+        templates.add("\\$\\{REPLACE_THIS\\}");
         testProps(
                 false,
                 false,
                 true,
                 null,
                 Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/resources/app2.properties")),
-                null,
+                templates,
                 Collections.singleton(FileSpecs.absoluteCwdAndFile("src/test/java/com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/App2.java")),
                 true,
                 Collections.emptySet(),

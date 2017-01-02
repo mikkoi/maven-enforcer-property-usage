@@ -37,7 +37,7 @@ public class FileSpecsTest {
         );
         expected = expected.stream().sorted().collect(Collectors.toSet());
         slog.debug("current dir:"+ Paths.get("").toAbsolutePath().toString());
-        Collection<String> filenames = FileSpecs.getAbsoluteFilenames(files, Paths.get(""), slog);
+        Collection<String> filenames = FileSpecs.getAbsoluteFilenames(files, Paths.get("").toAbsolutePath(), slog);
         filenames = filenames.stream().sorted().collect(Collectors.toSet());
         assertEquals("Filenames are as expected.", expected, filenames);
     }
@@ -51,7 +51,7 @@ public class FileSpecsTest {
         );
         Collection<String> expected = Collections.emptySet();
         expected = expected.stream().sorted().collect(Collectors.toSet());
-        Collection<String> filenames = FileSpecs.getAbsoluteFilenames(files, Paths.get(""), slog);
+        Collection<String> filenames = FileSpecs.getAbsoluteFilenames(files, Paths.get("").toAbsolutePath(), slog);
         filenames = filenames.stream().sorted().collect(Collectors.toSet());
         assertEquals("Filenames are as expected (none).", expected, filenames);
     }

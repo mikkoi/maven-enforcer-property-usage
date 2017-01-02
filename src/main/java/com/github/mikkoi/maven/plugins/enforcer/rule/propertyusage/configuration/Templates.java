@@ -9,7 +9,7 @@ public class Templates {
     /**
      * Replace template property name placeholder with this when searching for properties.
      */
-    public static final String PROPERTY_NAME_REGEXP = "([a-z\\-\\.]{1,}?)";
+    public static final String PROPERTY_NAME_REGEXP = "([a-z0-9\\-\\.]{1,}?)";
 
     /**
      * Default property name placeholder string to replace in template.

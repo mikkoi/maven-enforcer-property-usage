@@ -115,6 +115,12 @@ public final class PropertyUsageRule implements EnforcerRule {
     private String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
 
     /**
+     * Replace template property name placeholder with this when searching for properties.
+     */
+    @Nonnull
+    private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;
+
+    /**
      * Definitions
      */
     @Nonnull
@@ -171,9 +177,11 @@ public final class PropertyUsageRule implements EnforcerRule {
         }
 
         log.debug("PropertyUsageRule:execute() - Settings:");
+        log.debug("basedir:" + basedir);
         log.debug("propertiesEnc:" + propertiesEnc.toString());
         log.debug("sourceEnc:" + sourceEnc.toString());
         log.debug("replaceInTemplateWithPropertyName:" + replaceInTemplateWithPropertyName);
+        log.debug("propertyNameRegexp:" + propertyNameRegexp);
         log.debug("definitions:" + definitions.toString());
         log.debug("templates:" + templates.toString());
         log.debug("usages:" + usages.toString());
@@ -230,7 +238,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                 log.debug("usedPropertiesAreDefined");
                 final Set<String> readyTemplates = new HashSet<>();
                 templates.forEach(tpl -> readyTemplates.add(
-                                        tpl.replaceAll(replaceInTemplateWithPropertyName, Templates.PROPERTY_NAME_REGEXP)
+                                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyNameRegexp)
                         )
                 );
                 log.debug("readyTemplates:" + readyTemplates);

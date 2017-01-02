@@ -48,7 +48,8 @@ Add the following to your project's `pom.xml` file:
                             <definitionsOnlyOnce>true</definitionsOnlyOnce>
                             <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
                             <usedPropertiesAreDefined>true</usedPropertiesAreDefined>
-                            <replaceInTemplateWithPropertyName>REPLACE_THIS<replaceInTemplateWithPropertyName>
+                            <replaceInTemplateWithPropertyName>REPLACE_THIS</replaceInTemplateWithPropertyName>
+                            <propertyNameRegexp>([a-z0-9\-\.]{1,}?)</propertyNameRegexp>
                             <definitions>
                                 <!-- The files from which to read the used properties. -->
                                 <!-- default: src/main/resources/**/*.properties -->
