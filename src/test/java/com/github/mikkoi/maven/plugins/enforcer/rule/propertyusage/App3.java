@@ -1,10 +1,11 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"all"})
 public class App3 {
 
     public String value1 = "";
@@ -20,7 +21,7 @@ public class App3 {
             value1 = properties.getProperty("my-first.property.value");
             value2 = Integer.valueOf(properties.getProperty("my-second.prop.val"));
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
 

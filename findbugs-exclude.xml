@@ -33,17 +33,23 @@
     <!--</Match>-->
 
     <!-- All bugs in test classes, except for JUnit-specific bugs -->
-    <!--<Match>-->
-    <!--<Class name="~.*\.*Test" />-->
-    <!--<Not>-->
-    <!--<Bug code="IJU" />-->
-    <!--</Not>-->
-    <!--</Match>-->
+    <Match>
+        <Class name="~.*\.*Test"/>
+        <Class name="~.*\.*App*"/>
+        <Not>
+            <Bug code="URF"/><!-- URF_UNREAD_FIELD -->
+        </Not>
+    </Match>
 
     <Match>
+        <Class name=".*"/>
         <Not>
-            <Bug code="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+            <Bug code="RCN"/><!-- RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE -->
         </Not>
+    </Match>
+
+    <Match>
+        <Bug category="SECURITY"/>
     </Match>
 
 </FindBugsFilter>

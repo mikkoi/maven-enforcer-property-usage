@@ -1,9 +1,11 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@SuppressWarnings({"all"})
 public class App2 {
 
     public String value1 = "";
@@ -19,7 +21,7 @@ public class App2 {
             value1 = properties.getProperty("my-too.property.value");
             value2 = Integer.valueOf(properties.getProperty("other-too.prop.val"));
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
 
