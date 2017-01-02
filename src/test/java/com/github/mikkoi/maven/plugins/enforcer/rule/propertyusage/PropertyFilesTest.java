@@ -1,6 +1,5 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-import com.google.common.collect.Maps;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.Test;
 
@@ -9,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +19,7 @@ public class PropertyFilesTest {
 
     @Test
     public void readPropertiesFromFiles_Normal() throws Exception {
-        Map<String, Integer> expected = Maps.newHashMap();
+        Map<String, Integer> expected = new HashMap<>();
         expected.put("my.property.value", 1);
         expected.put("other.prop.val", 1);
         expected.put("my-too.property.value", 1);
@@ -50,7 +50,7 @@ public class PropertyFilesTest {
 
     @Test
     public void readPropertiesFromFiles_EmptyFilesAreOK() throws Exception {
-        Map<String, Integer> expected = Maps.newHashMap();
+        Map<String, Integer> expected = new HashMap<>();
         Collection<String> filenames = Collections.singletonList(
                 "src/test/resources/empty.properties"
         );
@@ -61,7 +61,7 @@ public class PropertyFilesTest {
 
     @Test
     public void readPropertiesFromTestPropertyFile() throws Exception {
-        Map<String, Integer> expected = Maps.newHashMap();
+        Map<String, Integer> expected = new HashMap<>();
         expected.put("first.property.value", 2);
         expected.put("second.property.value", 1);
         expected.put("third.property.value", 4);
