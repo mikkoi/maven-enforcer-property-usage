@@ -88,19 +88,19 @@
         <!--<surefireArgLine></surefireArgLine> &lt;!&ndash; Dummy, otherwise surefile plugin conf causes IntelliJ to complain &ndash;&gt;-->
 
         <!-- SonarQube intergration -->
-        <sonar.host.url>https://sonarqube.com</sonar.host.url>
-        <sonar.language>java</sonar.language>
-        <sonar.projectDescription>${project.description}</sonar.projectDescription>
-        <sonar.links.homepage>http://mikkoi.github.io/maven-enforcer-property-usage/</sonar.links.homepage>
-        <!--<sonar.links.ci></sonar.links.ci>-->
-        <sonar.links.issue>${project.issueManagement.url}</sonar.links.issue>
-        <sonar.tests>src/test/java</sonar.tests>
-        <sonar.log.level>DEBUG</sonar.log.level>
-        <sonar.verbose>true</sonar.verbose>
-        <sonar.report.export.path>site/sonar</sonar.report.export.path>
-        <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
-        <sonar.java.binaries>target/classes</sonar.java.binaries>
-        <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+        <!--<sonar.host.url>https://sonarqube.com</sonar.host.url>-->
+        <!--<sonar.language>java</sonar.language>-->
+        <!--<sonar.projectDescription>${project.description}</sonar.projectDescription>-->
+        <!--<sonar.links.homepage>http://mikkoi.github.io/maven-enforcer-property-usage/</sonar.links.homepage>-->
+        <!--&lt;!&ndash;<sonar.links.ci></sonar.links.ci>&ndash;&gt;-->
+        <!--<sonar.links.issue>${project.issueManagement.url}</sonar.links.issue>-->
+        <!--<sonar.tests>src/test/java</sonar.tests>-->
+        <!--<sonar.log.level>DEBUG</sonar.log.level>-->
+        <!--<sonar.verbose>true</sonar.verbose>-->
+        <!--<sonar.report.export.path>site/sonar</sonar.report.export.path>-->
+        <!--<sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>-->
+        <!--<sonar.java.binaries>target/classes</sonar.java.binaries>-->
+        <!--<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>-->
     </properties>
 
     <dependencyManagement>
@@ -435,20 +435,20 @@
                     </excludes>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <configuration>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>sonar</id>
-                        <goals>
-                            <goal>sonar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.sonarsource.scanner.maven</groupId>-->
+                <!--<artifactId>sonar-maven-plugin</artifactId>-->
+                <!--<configuration>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>sonar</id>-->
+                        <!--<goals>-->
+                            <!--<goal>sonar</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

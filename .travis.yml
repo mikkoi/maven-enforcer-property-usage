@@ -1,11 +1,22 @@
 language: java
+sudo: false
+install: true
 jdk:
   - oraclejdk8
-script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
-  # - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar --activate-profiles ci
-  - mvn --activate-profiles ci clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 addons:
   sonarqube:
     token:
       secure: WsimqMtuIavmh1vOQwyaCgiX4VAPdAbloXac+uNNdW54nzfTJcRSQhhQ81lfp/8/6OKpztfTzttCOyCLiLBwbUSjVRUqM7/tC0rM/TIZWI3BP4so5tvSdkkVH0ZTq0/rUK95rbTMX8F1PV7J9Lnr/fmmf6CLbn5uBY1CqggrMS7lguHZ9+lXvGw+0m3ctCAFj3u3XLgRxIHMR9m9vsCktIcaLl+kVvCbW2tPgUoqrBhq56hzY00/TLLg7gIJqbWy8g858F5NRDYMk2a6daPyJdN5wZTUpzkgfmdncgYEILyEvEhcRToKcaDiIUTh6kYXr08t3KUJur85C86up84TPmTzBJPSdl01FizsRVX827IkBE5Lv2aun1KDG0pdrvJWE9io0PIv0Pbl/WQGNMdcXNAdH5KHkkC8Y34dlqZFKRAPN6EbUv+qUxjblCGwCID9a7R61T3iLdPvX1Ye/Bns+3WPx8PUY4kzqWpMTptiij1u40H9sFNoLDGkG8HhZheL63ypcrlx3pL0LUQIiTegV17M4dmAIiZd7vA0QP8XapoVuYBsN3w3xnEymkL/gBZIfSa1eEiH0Pkejd9NRBi09p1v+HLzjQ6ka7PR9RgaICsFGh+SM3zhGkmJiJbbXoCCuRd0mUIGAxCCOfSMlgxjw62WL/kQkgxyXQGm5PL5mjg=
+    branches:
+      - master
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
+  # - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar --activate-profiles ci
+  - mvn --activate-profiles ci clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
+notifications:
+  email: false
