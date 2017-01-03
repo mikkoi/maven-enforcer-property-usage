@@ -6,7 +6,7 @@
         http://maven.apache.org/xsd/decoration-1.7.0.xsd"
         name="Maven Enforcer Char Set Encoding" combine.self="merge">
     <bannerLeft>
-        <name>Maven Enforcer Rule Char Set Encoding</name>
+        <name>Maven Enforcer Rule Property Usage</name>
         <href>#</href>
     </bannerLeft>
 

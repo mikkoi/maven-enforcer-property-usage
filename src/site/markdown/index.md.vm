@@ -5,7 +5,7 @@ Maven Enforcer Plugin Rule: Property Usage
 provides goals to control certain environmental constraints such as Maven version,
 JDK version and OS family along with many more standard rules and user created rules.
 
-`${project.artifactId}` is a user created [custom rule](http://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
+`${project.artifactId}` is a user created [custom rule](https://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
 to verify the usage of defined properties in the source files of the build.
 
 It often happens during development that properties are defined and used,
@@ -15,4 +15,4 @@ properties are used.
 
 * For a quick adoption of the Enforcer rule, check the [Quickstart](quickstart.html) page.
 * To know more about the rule's configuration and parameters check the [Usage page](usage.html).
-* Released builds are available from [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cchar-set-encoding-rule).
+* Released builds are available from [Maven Central](https://search.maven.org/).

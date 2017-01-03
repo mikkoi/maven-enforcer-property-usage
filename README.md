@@ -15,7 +15,7 @@ no property is defined more than once.
 
 * [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/mojohaus/extra-enforcer-rules.svg?label=License)](http://www.apache.org/licenses/)
 * [![Maven Central](https://img.shields.io/maven-central/v/com.github.mikkoi.maven.enforcer.rule/property-usage-rule.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.mikkoi.maven.enforcer.rule%22%20a%3A%22property-usage-rule%22)
-* [Project Website](http://mikkoi.github.io/maven-enforcer-property-usage/)
+* [Project Website](https://mikkoi.github.io/maven-enforcer-property-usage/)
 * [SonarQube Reports](https://sonarqube.com/dashboard/index/com.github.mikkoi.maven.enforcer.rule:property-usage-rule)
 * [![Build Status](https://travis-ci.org/mikkoi/maven-enforcer-property-usage.svg?branch=master)](https://travis-ci.org/mikkoi/maven-enforcer-property-usage)
 
