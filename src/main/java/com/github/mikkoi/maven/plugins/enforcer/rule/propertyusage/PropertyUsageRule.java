@@ -138,7 +138,7 @@ public final class PropertyUsageRule implements EnforcerRule {
         Path basedir = Paths.get("");
         try {
             basedir = Paths.get(helper.evaluate("${project.basedir}").toString());
-        } catch (ExpressionEvaluationException | NullPointerException e) {
+        } catch (ExpressionEvaluationException e) {
             log.error("Cannot get property 'project.basedir'. Using current working directory. Error:" + e);
         }
 
@@ -155,7 +155,7 @@ public final class PropertyUsageRule implements EnforcerRule {
             } else {
                 sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
             }
-        } catch (ExpressionEvaluationException | NullPointerException e) {
+        } catch (ExpressionEvaluationException e) {
             log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
         }
 
