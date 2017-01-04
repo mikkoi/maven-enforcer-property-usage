@@ -19,7 +19,7 @@ notifications:
   email: false
 env:
   global:
-    secure: ID+199e7/ufsB/FkJTHMydr3WClFNVatRE8b3ps0FbjzHc/+4N6WmAiNQeCVa2aQB7/XZfNbSRm1AvQDgkw/eDrf+t2SFsSQL1DVci8lv/5sf2Bq8WwS4GGQI4bqQ9gfr5RFux0nTmI7tGK/J5iERQEhfYLZuAooNb/6abdWaK20VaH+uQtCKxXcwh6bepeO58NWQBiP85EmEgKpk/RrdFAaYS1NdNm3fo4jftZ2RmYYS51jarUCvPPobwfXklTNlZEFqbG3bukiwdKNg3zpIFopjghhzYxH2ABm+30PUWgkG55TPqweD4VD0lVgKSsyEUzyHBwGKFoOEyaF2GYCRY3rhhdY/3MtVhDYyFw2aSTYxXZNsZbIa70ns6ybI/ziElw0M3iBxoGHXacno4Dq6/n87gM93QtCRuNrgwWZW8iSx/KMVllpvH79d+nxSCHUXfx7TKTBGYDRI0sAqZVgu0E4ii4oI4+Kp16MN/XeEaN2Dikhl1KZyUWWtSiS+naLtSGOKZCdcV6fIb+fmpAjlFm71gRrg2zFfxeqw670DWQCldHJLW9HPiAas+AlFgl6td4m+BRtlU+gQoVfUYp2hcyYCodZyKC3njt2bnhjyq4+e/L+Vs/IHB4UCzwj4D36LF7ZoUwIShyVloEhY4zPaT8NzSEAzSWXkSfuR9iamlM=
+  - secure: ppJJehhPBhDH89ZjRl2ibqZG5PNJvJbzZggWsJWRQVGvPKRZoJIoCOnd16Y+KNZSBJ3j5ig2IePTEIS1yzr4o8YZIXQo5MePWiG8g1ITcJgSmZI4IzTXv7ceB7wICnBMUB/M23KRzWd4G7CMM414zQg1fbJHyz+4Wmrss+unueN1+appbCGAmNRir4nov5+iIQcQD+2Pgp6hq1wIiciJDWbQZfZPc0lckg/JZqVrJ9+258MCaSBuVhqB6jzkVLtSHn/2HFNMD+LVxN+v/8ZGcnYOpNuEu6iR9G5H2eE9GxTW7rt/QfPaklK4/qb83MfK4MB/cPw/n/2dngCmYNTZ3WQ6H70czbzsUTduUqgucw/BknuuiykiuqRToXc2jU96571+V5aO2HDxIs8F4S0HNvfZ1SBu25DSBthxNyZSSm664k+I7XAMzxFtQU5zqjjDZCXZQrSkMcsr+SKAncpv+w6ND1+PC4maG/ee0je0WXyrsHKLQZCpeoaBXbhnf9QWDCriWaH2A7NY3qj17HGke0/eM1jjQoA4inSseR9ZK64UfAJAiaKETfY81mIP6jo+ZKzjwc3LGdkpX8AY/w7fkfkn53gmbf3VkEjPR1rHodv7KcW8zXcg+YrrRBzn/CR/3uJ/jSloC3XsWishyxGwFkitNdB8cAo6Xar7Rr/r7Lk=
 after_success:
 - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master"
 - mvn site
@@ -30,10 +30,10 @@ after_success:
 - git config --local user.email "travis.ci@dummy.travis"
 - git config --local core.autocrlf false
 - git config --local core.safecrlf false
-- git remote add github-pages https://$GITHUB_TOKEN@github.com/mikkoi/maven-enforcer-property-usage.git
-- git fetch github-pages gh-pages
-- git checkout -b gh-pages github-pages/gh-pages
-- cp target/site/* .
+- git remote add github-pages https://${GITHUB_TOKEN}@github.com/mikkoi/maven-enforcer-property-usage.git
+- git fetch --quiet github-pages gh-pages
+- git checkout --quiet -b gh-pages github-pages/gh-pages
+- cp --recursive target/site/* .
 - git add --all
-- git commit -m "Publish site at GitHub Pages (ref ${ref})"
-- git push github-pages gh-pages
+- git commit -m "Publish site at GitHub Pages (rev ${rev})"
+- git push --quiet github-pages gh-pages
