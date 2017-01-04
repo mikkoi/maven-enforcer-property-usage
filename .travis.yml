@@ -2,21 +2,38 @@ language: java
 sudo: false
 install: true
 jdk:
-  - oraclejdk8
+- oraclejdk8
 addons:
   sonarqube:
     token:
       secure: WsimqMtuIavmh1vOQwyaCgiX4VAPdAbloXac+uNNdW54nzfTJcRSQhhQ81lfp/8/6OKpztfTzttCOyCLiLBwbUSjVRUqM7/tC0rM/TIZWI3BP4so5tvSdkkVH0ZTq0/rUK95rbTMX8F1PV7J9Lnr/fmmf6CLbn5uBY1CqggrMS7lguHZ9+lXvGw+0m3ctCAFj3u3XLgRxIHMR9m9vsCktIcaLl+kVvCbW2tPgUoqrBhq56hzY00/TLLg7gIJqbWy8g858F5NRDYMk2a6daPyJdN5wZTUpzkgfmdncgYEILyEvEhcRToKcaDiIUTh6kYXr08t3KUJur85C86up84TPmTzBJPSdl01FizsRVX827IkBE5Lv2aun1KDG0pdrvJWE9io0PIv0Pbl/WQGNMdcXNAdH5KHkkC8Y34dlqZFKRAPN6EbUv+qUxjblCGwCID9a7R61T3iLdPvX1Ye/Bns+3WPx8PUY4kzqWpMTptiij1u40H9sFNoLDGkG8HhZheL63ypcrlx3pL0LUQIiTegV17M4dmAIiZd7vA0QP8XapoVuYBsN3w3xnEymkL/gBZIfSa1eEiH0Pkejd9NRBi09p1v+HLzjQ6ka7PR9RgaICsFGh+SM3zhGkmJiJbbXoCCuRd0mUIGAxCCOfSMlgxjw62WL/kQkgxyXQGm5PL5mjg=
     branches:
-      - master
+    - master
 script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
-  # - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar --activate-profiles ci
-  - mvn --activate-profiles ci clean install sonar:sonar
-
+- mvn --activate-profiles ci clean install sonar:sonar
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
+  - "$HOME/.m2/repository"
+  - "$HOME/.sonar/cache"
 notifications:
   email: false
+env:
+  global:
+    secure: ID+199e7/ufsB/FkJTHMydr3WClFNVatRE8b3ps0FbjzHc/+4N6WmAiNQeCVa2aQB7/XZfNbSRm1AvQDgkw/eDrf+t2SFsSQL1DVci8lv/5sf2Bq8WwS4GGQI4bqQ9gfr5RFux0nTmI7tGK/J5iERQEhfYLZuAooNb/6abdWaK20VaH+uQtCKxXcwh6bepeO58NWQBiP85EmEgKpk/RrdFAaYS1NdNm3fo4jftZ2RmYYS51jarUCvPPobwfXklTNlZEFqbG3bukiwdKNg3zpIFopjghhzYxH2ABm+30PUWgkG55TPqweD4VD0lVgKSsyEUzyHBwGKFoOEyaF2GYCRY3rhhdY/3MtVhDYyFw2aSTYxXZNsZbIa70ns6ybI/ziElw0M3iBxoGHXacno4Dq6/n87gM93QtCRuNrgwWZW8iSx/KMVllpvH79d+nxSCHUXfx7TKTBGYDRI0sAqZVgu0E4ii4oI4+Kp16MN/XeEaN2Dikhl1KZyUWWtSiS+naLtSGOKZCdcV6fIb+fmpAjlFm71gRrg2zFfxeqw670DWQCldHJLW9HPiAas+AlFgl6td4m+BRtlU+gQoVfUYp2hcyYCodZyKC3njt2bnhjyq4+e/L+Vs/IHB4UCzwj4D36LF7ZoUwIShyVloEhY4zPaT8NzSEAzSWXkSfuR9iamlM=
+after_success:
+- test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master"
+- mvn site
+- git reset --hard HEAD
+- git clean -d --force
+- rev="$(git rev-parse --short HEAD)"
+- git config --local user.name "Travis CI"
+- git config --local user.email "travis.ci@dummy.travis"
+- git config --local core.autocrlf false
+- git config --local core.safecrlf false
+- git remote add github-pages https://$GITHUB_TOKEN@github.com/mikkoi/maven-enforcer-property-usage.git
+- git fetch github-pages gh-pages
+- git checkout -b gh-pages github-pages/gh-pages
+- cp target/site/* .
+- git add --all
+- git commit -m "Publish site at GitHub Pages (ref ${ref})"
+- git push github-pages gh-pages
