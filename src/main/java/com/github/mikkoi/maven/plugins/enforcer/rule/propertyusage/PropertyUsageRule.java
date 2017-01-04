@@ -212,7 +212,7 @@ public final class PropertyUsageRule implements EnforcerRule {
 
             // Iterate through fileSpecs and collect property usage.
             // Iterate
-            UsageFiles usageFiles = new UsageFiles(log);
+            final UsageFiles usageFiles = new UsageFiles(log);
             if (definedPropertiesAreUsed) {
                 log.debug("definedPropertiesAreUsed");
                 final Map<String,String> readyTemplates = new HashMap<>();
@@ -415,7 +415,7 @@ public final class PropertyUsageRule implements EnforcerRule {
         return usages;
     }
 
-    public void setUsages(@Nonnull Collection<String> usages) {
+    public void setUsages(@Nonnull final Collection<String> usages) {
         this.usages = usages;
     }
 }
