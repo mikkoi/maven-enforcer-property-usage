@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyUsageRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Maven Enforcer Property Usage</a> &gt; <a href="index.source.html" class="el_package">com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage</a> &gt; <span class="el_source">PropertyUsageRule.java</span></div><h1>PropertyUsageRule.java</h1><pre class="source lang-java linenums">package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
+
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.UsageLocation;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
+import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.util.StringUtils;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+/**
+ * Verifies for usage of properties mentioned in .properties files.
+ */
+@SuppressWarnings(&quot;WeakerAccess&quot;)
+<span class="fc" id="L32">public final class PropertyUsageRule implements EnforcerRule {</span>
+
+    /**
+     * Default character set for all files to read.
+     */
+<span class="fc" id="L37">    private static final Charset DEFAULT_CHAR_SET = Charset.forName(&quot;UTF-8&quot;);</span>
+
+    /**
+     * Properties which were defined more than once.
+     */
+<span class="fc" id="L42">    @Nonnull</span>
+    private final Map&lt;String, Integer&gt; propertiesDefinedMoreThanOnce = new ConcurrentHashMap&lt;&gt;();
+
+    /**
+     * Properties which were not found in usages.
+     */
+<span class="fc" id="L48">    @Nonnull</span>
+    private final Set&lt;String&gt; propertiesNotUsed = new HashSet&lt;&gt;();
+
+    /**
+     * Properties which were used in usages but not defined in definitions.
+     */
+<span class="fc" id="L54">    @Nonnull</span>
+    private final Set&lt;UsageFiles.UsageLocation&gt; propertiesNotDefined = new HashSet&lt;&gt;();
+
+    /**
+     * Logger given by Maven Enforcer.
+     */
+    Log log;
+
+    //
+    // Following variables match the configuration items
+    // and are populated by Maven/Enforcer, despite being private. (!)
+    // I'm not sure I want to known how it happens.
+    //
+
+    /**
+     * Character encoding for source (usage) files.
+     */
+<span class="fc" id="L71">    private String sourceEncoding = DEFAULT_CHAR_SET.toString();//NOPMD</span>
+
+    /**
+     * Character encoding for properties files.
+     */
+<span class="fc" id="L76">    private String propertiesEncoding = DEFAULT_CHAR_SET.toString();//NOPMD</span>
+
+    /**
+     * Activate definitionsOnlyOnce
+     */
+<span class="fc" id="L81">    private boolean definitionsOnlyOnce = true;</span>
+
+    /**
+     * Activate definedPropertiesAreUsed
+     */
+<span class="fc" id="L86">    private boolean definedPropertiesAreUsed = true;</span>
+
+    /**
+     * Activate usedPropertiesAreDefined
+     */
+<span class="fc" id="L91">    private boolean usedPropertiesAreDefined = true;</span>
+
+    /**
+     * Replace this string with property name in template(s).
+     */
+<span class="fc" id="L96">    @Nonnull</span>
+    private String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
+
+    /**
+     * Replace template property name placeholder with this
+     * when searching for properties.
+     */
+<span class="fc" id="L103">    @Nonnull</span>
+    private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;//NOPMD
+
+    /**
+     * Definitions
+     */
+<span class="fc" id="L109">    @Nonnull</span>
+<span class="fc" id="L110">    private Collection&lt;String&gt; definitions = Definitions.getDefault();</span>
+    /**
+     * Templates
+     */
+<span class="fc" id="L114">    @Nonnull</span>
+<span class="fc" id="L115">    private Collection&lt;String&gt; templates = Templates.getDefault();</span>
+    /**
+     * Usages
+     */
+<span class="fc" id="L119">    @Nonnull</span>
+<span class="fc" id="L120">    private Collection&lt;String&gt; usages = Usages.getDefault();</span>
+
+    /**
+     * @param helper EnforcerRuleHelper
+     * @throws EnforcerRuleException Throws when error
+     */
+    @Override
+    @SuppressWarnings({
+            &quot;squid:S3776&quot;,  // Cognitive Complexity of methods should not be too high
+            &quot;squid:S1067&quot;,  // Expressions should not be too complex
+            &quot;squid:S1192&quot;,  // String literals should not be duplicated
+            &quot;squid:MethodCyclomaticComplexity&quot;
+    })
+    //@SuppressWarnings(&quot;squid:S1192&quot;)
+    public void execute(@Nonnull final EnforcerRuleHelper helper)
+            throws EnforcerRuleException {
+<span class="fc" id="L136">        log = helper.getLog();</span>
+
+<span class="fc" id="L138">        Path basedir = Paths.get(&quot;&quot;);</span>
+        try {
+<span class="fc" id="L140">            basedir = Paths.get(helper.evaluate(&quot;${project.basedir}&quot;).toString());</span>
+<span class="nc" id="L141">        } catch (ExpressionEvaluationException e) {</span>
+<span class="nc" id="L142">            log.error(&quot;Cannot get property 'project.basedir'. Using current working directory. Error:&quot; + e);</span>
+<span class="fc" id="L143">        }</span>
+
+<span class="fc" id="L145">        Charset propertiesEnc = DEFAULT_CHAR_SET;</span>
+<span class="fc" id="L146">        Charset sourceEnc = DEFAULT_CHAR_SET;</span>
+        try {
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">            if(StringUtils.isNotBlank(propertiesEncoding)) {</span>
+<span class="fc" id="L149">                propertiesEnc = Charset.forName(propertiesEncoding);</span>
+            } else {
+<span class="nc" id="L151">                propertiesEnc = Charset.forName(helper.evaluate(&quot;${project.build.sourceEncoding}&quot;).toString());</span>
+            }
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">            if(StringUtils.isNotBlank(sourceEncoding)) {</span>
+<span class="fc" id="L154">                sourceEnc = Charset.forName(sourceEncoding);</span>
+            } else {
+<span class="nc" id="L156">                sourceEnc = Charset.forName(helper.evaluate(&quot;${project.build.sourceEncoding}&quot;).toString());</span>
+            }
+<span class="nc" id="L158">        } catch (ExpressionEvaluationException e) {</span>
+<span class="nc" id="L159">            log.error(&quot;Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:&quot; + e);</span>
+<span class="fc" id="L160">        }</span>
+
+<span class="fc" id="L162">        log.debug(&quot;PropertyUsageRule:execute() - Settings:&quot;);</span>
+<span class="fc" id="L163">        log.debug(&quot;basedir:&quot; + basedir);</span>
+<span class="fc" id="L164">        log.debug(&quot;propertiesEnc:&quot; + propertiesEnc.toString());</span>
+<span class="fc" id="L165">        log.debug(&quot;sourceEnc:&quot; + sourceEnc.toString());</span>
+<span class="fc" id="L166">        log.debug(&quot;replaceInTemplateWithPropertyName:&quot; + replaceInTemplateWithPropertyName);</span>
+<span class="fc" id="L167">        log.debug(&quot;propertyNameRegexp:&quot; + propertyNameRegexp);</span>
+<span class="fc" id="L168">        log.debug(&quot;definitions:&quot; + definitions.toString());</span>
+<span class="fc" id="L169">        log.debug(&quot;templates:&quot; + templates.toString());</span>
+<span class="fc" id="L170">        log.debug(&quot;usages:&quot; + usages.toString());</span>
+
+        try {
+<span class="fc" id="L173">            log.debug(&quot;PropertyUsageRule:execute() - Run:&quot;);</span>
+            // Get property definitions (i.e. property names):
+            // Get all the fileSpecs to read for the properties definitions.
+<span class="fc" id="L176">            final Collection&lt;String&gt; propertyFilenames = FileSpecs.getAbsoluteFilenames(definitions, basedir, log)</span>
+<span class="fc" id="L177">                    .stream().sorted().collect(Collectors.toSet());</span>
+            // Get the property definitions and how many times they are defined.
+            Map&lt;String, Integer&gt; definedProperties;
+<span class="fc bfc" id="L180" title="All 2 branches covered.">            if (definitionsOnlyOnce) {</span>
+<span class="fc" id="L181">                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithCount(propertyFilenames);</span>
+<span class="fc" id="L182">                definedProperties.forEach((prop, nrOf) -&gt; {</span>
+<span class="fc" id="L183">                    log.debug(&quot;Property '&quot; + prop + &quot;' defined &quot; + nrOf + &quot; times.&quot;);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">                    if (nrOf &gt; 1) {</span>
+<span class="fc" id="L185">                        propertiesDefinedMoreThanOnce.put(prop, nrOf);</span>
+                    }
+<span class="fc" id="L187">                });</span>
+            } else {
+<span class="fc" id="L189">                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithoutCount(propertyFilenames);</span>
+            }
+
+            // Get all the fileSpecs to check for property usage.
+            // Normally **/*.java, maybe **/*.jsp, etc.
+<span class="fc" id="L194">            final Collection&lt;String&gt; usageFilenames = FileSpecs.getAbsoluteFilenames(usages, basedir, log)</span>
+<span class="fc" id="L195">                    .stream().sorted().collect(Collectors.toSet());</span>
+
+            // Iterate through fileSpecs and collect property usage.
+            // Iterate
+<span class="fc" id="L199">            final UsageFiles usageFiles = new UsageFiles(log);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            if (definedPropertiesAreUsed) {</span>
+<span class="fc" id="L201">                log.debug(&quot;definedPropertiesAreUsed&quot;);</span>
+<span class="fc" id="L202">                final Map&lt;String,String&gt; readyTemplates = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L203">                templates.forEach(tpl -&gt; definedProperties.forEach(</span>
+                        (propertyDefinition, nrPropertyDefinitions) -&gt;
+<span class="fc" id="L205">                                readyTemplates.put(</span>
+<span class="fc" id="L206">                                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyDefinition),</span>
+                                        propertyDefinition
+                                )
+                        )
+                );
+<span class="fc" id="L211">                log.debug(&quot;readyTemplates:&quot; + readyTemplates);</span>
+<span class="fc" id="L212">                final Collection&lt;String&gt; usedProperties</span>
+<span class="fc" id="L213">                        = usageFiles.readDefinedUsagesFromFiles(usageFilenames, readyTemplates, sourceEnc);</span>
+<span class="fc" id="L214">                definedProperties.forEach((prop, nrOf) -&gt; {</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                    if (!usedProperties.contains(prop)) {</span>
+<span class="fc" id="L216">                        log.debug(&quot;Property &quot; + prop + &quot; not used.&quot;);</span>
+<span class="fc" id="L217">                        propertiesNotUsed.add(prop);</span>
+                    }
+<span class="fc" id="L219">                });</span>
+            }
+<span class="fc bfc" id="L221" title="All 2 branches covered.">            if (usedPropertiesAreDefined) {</span>
+<span class="fc" id="L222">                log.debug(&quot;usedPropertiesAreDefined&quot;);</span>
+<span class="fc" id="L223">                final Set&lt;String&gt; readyTemplates = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L224">                templates.forEach(tpl -&gt; readyTemplates.add(</span>
+<span class="fc" id="L225">                                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyNameRegexp)</span>
+                        )
+                );
+<span class="fc" id="L228">                log.debug(&quot;readyTemplates:&quot; + readyTemplates);</span>
+<span class="fc" id="L229">                final Collection&lt;UsageLocation&gt; usageLocations</span>
+<span class="fc" id="L230">                        = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEnc);</span>
+<span class="fc" id="L231">                usageLocations.forEach(loc -&gt; {</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">                    if (definedProperties.containsKey(loc.getProperty())) {</span>
+<span class="fc" id="L233">                        log.debug(&quot;Property &quot; + loc.getProperty() + &quot; defined.&quot;);</span>
+                    } else {
+<span class="fc" id="L235">                        log.debug(&quot;Property &quot; + loc.getProperty() + &quot; not defined.&quot;);</span>
+<span class="fc" id="L236">                        propertiesNotDefined.add(loc);</span>
+                    }
+<span class="fc" id="L238">                });</span>
+            }
+<span class="nc" id="L240">        } catch (IOException e) {</span>
+<span class="nc" id="L241">            throw new EnforcerRuleException(</span>
+<span class="nc" id="L242">                    &quot;IO error: &quot; + e.getLocalizedMessage(), e</span>
+            );
+<span class="fc" id="L244">        }</span>
+
+        // Report errors in wanted categories:
+        // propertiesDefinedMoreThanOnce
+<span class="fc bfc" id="L248" title="All 2 branches covered.">        if (definitionsOnlyOnce) {</span>
+<span class="fc" id="L249">            propertiesDefinedMoreThanOnce.forEach((key, value) -&gt;</span>
+<span class="fc" id="L250">                    log.error(&quot;Property '&quot; + key + &quot;' defined &quot; + value + &quot; times!&quot;)</span>
+            );
+        }
+        // propertiesNotUsed
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        if (definedPropertiesAreUsed) {</span>
+<span class="fc" id="L255">            propertiesNotUsed.forEach(key -&gt;</span>
+<span class="fc" id="L256">                    log.error(&quot;Property '&quot; + key + &quot;' not used!&quot;)</span>
+            );
+        }
+        // propertiesNotDefined
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        if (usedPropertiesAreDefined) {</span>
+<span class="fc" id="L261">            propertiesNotDefined.forEach(loc -&gt;</span>
+<span class="fc" id="L262">                    log.error(&quot;Property '&quot; + loc.getProperty() + &quot;' used without defining it (&quot;</span>
+<span class="fc" id="L263">                            + loc.getFilename() + &quot;:&quot; + loc.getRow() + &quot;)&quot;));</span>
+        }
+
+        // Fail rule if errors in wanted categories.
+<span class="fc bfc" id="L267" title="All 6 branches covered.">        if (definedPropertiesAreUsed &amp;&amp; !propertiesNotUsed.isEmpty()</span>
+<span class="fc bfc" id="L268" title="All 4 branches covered.">                || usedPropertiesAreDefined &amp;&amp; !propertiesNotDefined.isEmpty()</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">                || definitionsOnlyOnce &amp;&amp; !propertiesDefinedMoreThanOnce.isEmpty()</span>
+                ) {
+<span class="fc" id="L271">            throw new EnforcerRuleException(</span>
+                    &quot;Errors in property definitions or usage!&quot;
+            );
+        }
+<span class="fc" id="L275">    }</span>
+
+    /**
+     * If your rule is cacheable, you must return a unique id
+     * when parameters or conditions change that would cause
+     * the result to be different. Multiple cached results are stored
+     * based on their id.
+     * &lt;p&gt;
+     * The easiest way to do this is to return a hash computed
+     * from the values of your parameters.
+     * &lt;p&gt;
+     * If your rule is not cacheable, then the result here
+     * is not important, you may return anything.
+     *
+     * @return Always false here.
+     */
+    @Override
+    @Nullable
+    public String getCacheId() {
+<span class="nc" id="L294">        return String.valueOf(false);</span>
+    }
+
+    /**
+     * This tells the system if the results are cacheable at
+     * all. Keep in mind that during forked builds and other things,
+     * a given rule may be executed more than once for the same
+     * project. This means that even things that change from
+     * project to project may still be cacheable in certain instances.
+     *
+     * @return Always false here.
+     */
+    @Override
+    public boolean isCacheable() {
+<span class="nc" id="L308">        return false;</span>
+    }
+
+    /**
+     * If the rule is cacheable and the same id is found in the cache,
+     * the stored results are passed to this method to allow double
+     * checking of the results. Most of the time this can be done
+     * by generating unique ids, but sometimes the results of objects returned
+     * by the helper need to be queried. You may for example, store certain
+     * objects in your rule and then query them later.
+     *
+     * @param arg0 EnforcerRule
+     * @return Always false here.
+     */
+    @Override
+    public boolean isResultValid(@Nullable final EnforcerRule arg0) {
+<span class="nc" id="L324">        return false;</span>
+    }
+
+    /**
+     * Getters for results, used for testing.
+     */
+
+    @Nonnull
+    public Set&lt;String&gt; getPropertiesNotUsed() {
+<span class="fc" id="L333">        return propertiesNotUsed;</span>
+    }
+
+    @Nonnull
+    public Set&lt;UsageFiles.UsageLocation&gt; getPropertiesNotDefined() {
+<span class="fc" id="L338">        return propertiesNotDefined;</span>
+    }
+
+    @Nonnull
+    public Map&lt;String, Integer&gt; getPropertiesDefinedMoreThanOnce() {
+<span class="fc" id="L343">        return propertiesDefinedMoreThanOnce;</span>
+    }
+
+    public boolean isDefinedPropertiesAreUsed() {
+<span class="fc" id="L347">        return definedPropertiesAreUsed;</span>
+    }
+
+    public void setDefinedPropertiesAreUsed(final boolean definedPropertiesAreUsed) {
+<span class="fc" id="L351">        this.definedPropertiesAreUsed = definedPropertiesAreUsed;</span>
+<span class="fc" id="L352">    }</span>
+
+    public boolean isUsedPropertiesAreDefined() {
+<span class="fc" id="L355">        return usedPropertiesAreDefined;</span>
+    }
+
+    public void setUsedPropertiesAreDefined(final boolean usedPropertiesAreDefined) {
+<span class="fc" id="L359">        this.usedPropertiesAreDefined = usedPropertiesAreDefined;</span>
+<span class="fc" id="L360">    }</span>
+
+    public boolean isDefinitionsOnlyOnce() {
+<span class="fc" id="L363">        return definitionsOnlyOnce;</span>
+    }
+
+    public void setDefinitionsOnlyOnce(final boolean definitionsOnlyOnce) {
+<span class="fc" id="L367">        this.definitionsOnlyOnce = definitionsOnlyOnce;</span>
+<span class="fc" id="L368">    }</span>
+
+    @Nonnull
+    public String getReplaceInTemplateWithPropertyName() {
+<span class="fc" id="L372">        return replaceInTemplateWithPropertyName;</span>
+    }
+
+    public void setReplaceInTemplateWithPropertyName(@Nonnull final String replaceInTemplateWithPropertyName) {
+<span class="fc" id="L376">        this.replaceInTemplateWithPropertyName = replaceInTemplateWithPropertyName;</span>
+<span class="fc" id="L377">    }</span>
+
+    @Nonnull
+    public Collection&lt;String&gt; getDefinitions() {
+<span class="fc" id="L381">        return definitions;</span>
+    }
+
+    /**
+     * Setters for the parameters
+     * (these are not used by Maven Enforcer, used for testing).
+     */
+
+    public void setDefinitions(@Nonnull final Collection&lt;String&gt; definitions) {
+<span class="fc" id="L390">        this.definitions = definitions;</span>
+<span class="fc" id="L391">    }</span>
+
+    @Nonnull
+    public Collection&lt;String&gt; getTemplates() {
+<span class="fc" id="L395">        return templates;</span>
+    }
+
+    public void setTemplates(@Nonnull final Collection&lt;String&gt; templates) {
+<span class="fc" id="L399">        this.templates = templates;</span>
+<span class="fc" id="L400">    }</span>
+
+    @Nonnull
+    public Collection&lt;String&gt; getUsages() {
+<span class="fc" id="L404">        return usages;</span>
+    }
+
+    public void setUsages(@Nonnull final Collection&lt;String&gt; usages) {
+<span class="fc" id="L408">        this.usages = usages;</span>
+<span class="fc" id="L409">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

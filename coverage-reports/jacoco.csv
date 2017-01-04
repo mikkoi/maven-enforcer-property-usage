@@ -1,0 +1,9 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage,UsageFiles,0,286,0,10,0,41,0,12,0,7
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage,PropertyFiles,30,354,6,24,0,71,4,15,0,4
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage,UsageFiles.UsageLocation,0,21,0,0,0,8,0,4,0,4
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage,PropertyUsageRule,58,622,2,32,12,120,5,44,3,29
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration,FileSpecs,57,177,6,10,7,28,7,8,2,5
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration,Templates,3,3,0,0,2,1,1,1,1,1
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration,Definitions,3,3,0,0,2,1,1,1,1,1
+Maven Enforcer Property Usage,com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration,Usages,3,3,0,0,2,1,1,1,1,1

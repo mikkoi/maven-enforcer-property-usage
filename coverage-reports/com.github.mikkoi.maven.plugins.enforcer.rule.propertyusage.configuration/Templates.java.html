@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Templates.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Maven Enforcer Property Usage</a> &gt; <a href="index.source.html" class="el_package">com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration</a> &gt; <span class="el_source">Templates.java</span></div><h1>Templates.java</h1><pre class="source lang-java linenums">package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Collections;
+
+public class Templates {
+
+    /**
+     * Replace template property name placeholder with this when searching for properties.
+     */
+    public static final String PROPERTY_NAME_REGEXP = &quot;([a-z0-9\\-\\.]{1,}?)&quot;;
+
+    /**
+     * Default property name placeholder string to replace in template.
+     */
+    public static final String DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME = &quot;REPLACE_THIS&quot;;
+
+<span class="nc" id="L19">    private Templates() {</span>
+<span class="nc" id="L20">    }</span>
+
+    /**
+     * Get Default value
+     *
+     * @return collection of strings
+     */
+    @Nonnull
+    public static Collection&lt;String&gt; getDefault() {
+<span class="fc" id="L29">        return Collections.singleton(&quot;\&quot;&quot; + DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME + &quot;\&quot;&quot;);</span>
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

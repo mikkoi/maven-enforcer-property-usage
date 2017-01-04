@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileSpecs.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Maven Enforcer Property Usage</a> &gt; <a href="index.source.html" class="el_package">com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration</a> &gt; <span class="el_source">FileSpecs.java</span></div><h1>FileSpecs.java</h1><pre class="source lang-java linenums">package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration;
+
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.StringUtils;
+
+import javax.annotation.Nonnull;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
+/**
+ * Handle FileSpecs.
+ */
+public class FileSpecs {
+
+<span class="nc" id="L21">    private FileSpecs() {</span>
+<span class="nc" id="L22">    }</span>
+
+    public static String absoluteCwdAndFile(@Nonnull final String filename) {
+<span class="fc" id="L25">        return Paths.get(System.getProperty(&quot;user.dir&quot;), filename).toAbsolutePath().normalize().toString();</span>
+    }
+
+    /**
+     * Process collection of file names.
+     * If file name is a file, get its absolute path.
+     * If not, assume it is either a directory or a wildcard name, and
+     * scan it with DirectoryScanner.
+     *
+     * @param files A Collection of Strings
+     * @return A Collection of Strings
+     */
+    @Nonnull
+    public static Collection&lt;String&gt; getAbsoluteFilenames(
+            @Nonnull final Collection&lt;String&gt; files,
+            @Nonnull final Path basedir,
+            @Nonnull final Log log
+            ) {
+<span class="fc" id="L43">        Collection&lt;String&gt; allFilenames = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if(!files.isEmpty()) {</span>
+            // We have to process away files with an absolute path because
+            // DirectoryScanner can't handle them (as they may not be in basedir)
+            // So we take away all files that exist.
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            for (String fileSpec : files) {</span>
+<span class="fc" id="L49">                File file = new File(fileSpec);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                if (StringUtils.isBlank(fileSpec)) {</span>
+<span class="fc" id="L51">                    log.error(logFileIterationMsg(fileSpec, &quot;is blank. Error in configuration&quot;) + &quot;!&quot;);</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">                } else if (file.exists() &amp;&amp; file.isFile()) {</span>
+<span class="fc" id="L53">                    log.debug(logFileIterationMsg(fileSpec, &quot;is a file&quot;) + &quot;.&quot;);</span>
+<span class="fc" id="L54">                    allFilenames.add(file.getAbsolutePath()); // If item is already in Set, discarded automatically.</span>
+<span class="pc bpc" id="L55" title="3 of 4 branches missed.">                } else if (file.exists() &amp;&amp; file.isDirectory()) {</span>
+<span class="nc" id="L56">                    log.debug(logFileIterationMsg(fileSpec, &quot;is a directory&quot;) + &quot;.&quot;);</span>
+<span class="nc" id="L57">                    DirectoryScanner ds = initializeDS(Paths.get(fileSpec));</span>
+<span class="nc" id="L58">                    ds.scan();</span>
+<span class="nc" id="L59">                    allFilenames.addAll(Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; new File(includedFile).getAbsolutePath()).collect(Collectors.toSet()));</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                } else if (file.exists()) {</span>
+<span class="nc" id="L61">                    log.error(logFileIterationMsg(fileSpec, &quot;is not a file or directory. Do not know what to do&quot;) + &quot;!&quot;);</span>
+                } else {
+<span class="fc" id="L63">                    log.debug(logFileIterationMsg(fileSpec, &quot;does not exist. Assume wildcards&quot;) + &quot;.&quot;);</span>
+<span class="fc" id="L64">                    DirectoryScanner ds = initializeDS(basedir);</span>
+<span class="fc" id="L65">                    ds.setIncludes(new String[]{fileSpec});</span>
+<span class="fc" id="L66">                    ds.scan();</span>
+<span class="fc" id="L67">                    Collection&lt;String&gt; foundFiles = Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; Paths.get(basedir.toString(), includedFile).toString()).collect(Collectors.toSet());</span>
+<span class="fc" id="L68">                    log.debug(&quot;    Found files:&quot; + foundFiles.toString());</span>
+<span class="fc" id="L69">                    allFilenames.addAll(foundFiles);</span>
+                }
+<span class="fc" id="L71">            }</span>
+        }
+<span class="fc" id="L73">        return allFilenames;</span>
+    }
+
+    private static DirectoryScanner initializeDS(@Nonnull final Path path) {
+<span class="fc" id="L77">        DirectoryScanner ds = new DirectoryScanner();</span>
+<span class="fc" id="L78">        ds.setCaseSensitive(true);</span>
+<span class="fc" id="L79">        ds.setFollowSymlinks(true);</span>
+<span class="fc" id="L80">        ds.addDefaultExcludes();</span>
+<span class="fc" id="L81">        ds.setBasedir(path.toAbsolutePath().toString());</span>
+<span class="fc" id="L82">        return ds;</span>
+    }
+
+    @Nonnull
+    private static String logFileIterationMsg(@Nonnull final String filename, @Nonnull final String comment) {
+<span class="fc" id="L87">        return &quot;File spec '&quot; + filename + &quot;' &quot; + comment;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

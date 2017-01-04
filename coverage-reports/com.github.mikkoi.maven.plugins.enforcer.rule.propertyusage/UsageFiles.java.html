@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsageFiles.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Maven Enforcer Property Usage</a> &gt; <a href="index.source.html" class="el_package">com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage</a> &gt; <span class="el_source">UsageFiles.java</span></div><h1>UsageFiles.java</h1><pre class="source lang-java linenums">package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
+
+import org.apache.maven.plugin.logging.Log;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Handle issues with .properties files.
+ */
+class UsageFiles {
+
+    private final Log log;
+
+<span class="fc" id="L26">    UsageFiles(final Log log) {</span>
+<span class="fc" id="L27">        this.log = log;</span>
+<span class="fc" id="L28">    }</span>
+
+    /**
+     * Read usages by matching the property name in template.
+     * this is substituted with the property name.
+     *
+     * @param filenames  Collection of file names to search for property usage.
+     * @param templatesAndProperties  Collection of templates (regexp) to use for matching, and their equivalent property.
+     * @return Map of usages not found and their location (file,row), though location does not matter here.
+     */
+    @Nonnull
+    Set&lt;String&gt; readDefinedUsagesFromFiles(
+            @Nonnull final Collection&lt;String&gt; filenames,
+            @Nonnull final Map&lt;String,String&gt; templatesAndProperties,
+            @Nonnull final Charset charset)
+            throws IOException {
+<span class="fc" id="L44">        final Set&lt;String&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L45">        final Map&lt;Pattern,String&gt; tplPatterns = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L46">        templatesAndProperties.forEach((tpl,property) -&gt; tplPatterns.put(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS),property));</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        for (final String filename : filenames) {</span>
+<span class="fc" id="L48">            log.debug(&quot;Reading file '&quot; + filename + &quot;'.&quot;);</span>
+<span class="fc" id="L49">            final String allFile = String.join(&quot;&quot;, Files.readAllLines(Paths.get(filename), charset));</span>
+<span class="fc" id="L50">            tplPatterns.forEach((tplP, property) -&gt; {</span>
+<span class="fc" id="L51">                log.debug(&quot;    Matching pattern '&quot; + tplP.pattern() + &quot;'.&quot;);</span>
+<span class="fc" id="L52">                log.debug(&quot;        Matching with allFile '&quot; + allFile + &quot;'.&quot;);</span>
+<span class="fc" id="L53">                final Matcher matcher = tplP.matcher(allFile);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">                if (matcher.find()) {</span>
+<span class="fc" id="L55">                    log.debug(&quot;        Pattern match found (&quot; + filename + &quot;)&quot; + &quot;, pattern '&quot; + tplP.pattern() + &quot;'.&quot;);</span>
+<span class="fc" id="L56">                    results.add(property);</span>
+                }
+<span class="fc" id="L58">            });</span>
+<span class="fc" id="L59">        }</span>
+<span class="fc" id="L60">        return results;</span>
+    }
+
+    /**
+     * @param filenames Collection of file names to search for property usage.
+     * @param templates Map of templates (regexp) to use for matching,
+     *                  can be used to separate proper usage patterns for properties.
+     * @return Map of usages not found and their location (file, row).
+     */
+    @Nonnull
+    Set&lt;UsageLocation&gt; readAllUsagesFromFiles(
+            @Nonnull final Collection&lt;String&gt; filenames,
+            @Nonnull final Set&lt;String&gt; templates,
+            @Nonnull final Charset charset)
+            throws IOException {
+<span class="fc" id="L75">        final Set&lt;UsageLocation&gt; foundProperties = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L76">        final ArrayList&lt;Pattern&gt; tplPatterns = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L77">        templates.forEach(tpl -&gt; tplPatterns.add(Pattern.compile(tpl, Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS)));</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        for (final String filename : filenames) {</span>
+<span class="fc" id="L79">            log.debug(&quot;Reading file '&quot; + filename + &quot;'.&quot;);</span>
+<span class="fc" id="L80">            final Collection&lt;String&gt; lines = Files.readAllLines(Paths.get(filename), charset);</span>
+<span class="fc" id="L81">            tplPatterns.forEach(tplP -&gt; {</span>
+<span class="fc" id="L82">                log.debug(&quot;    Matching pattern '&quot; + tplP.pattern() + &quot;'.&quot;);</span>
+<span class="fc" id="L83">                int rowNr = 1;</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                for (final String row : lines) {</span>
+<span class="fc" id="L85">                    log.debug(&quot;        Matching with row '&quot; + row + &quot;'.&quot;);</span>
+<span class="fc" id="L86">                    final Matcher matcher = tplP.matcher(row);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                    if (matcher.find()) {</span>
+<span class="fc" id="L88">                        log.debug(&quot;            Pattern match found (&quot; + filename + &quot;:&quot; + rowNr + &quot;)&quot; + &quot;, pattern '&quot; + tplP.pattern() + &quot;'.&quot;);</span>
+<span class="fc" id="L89">                        final String propname = matcher.group(1);</span>
+<span class="fc" id="L90">                        log.debug(&quot;            Extracted property '&quot; + propname + &quot;'.&quot;);</span>
+<span class="fc" id="L91">                        foundProperties.add(new UsageLocation(propname, rowNr, filename));</span>
+                    }
+<span class="fc" id="L93">                    rowNr += 1;</span>
+<span class="fc" id="L94">                }</span>
+<span class="fc" id="L95">            });</span>
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">        return foundProperties;</span>
+    }
+
+    static class UsageLocation {
+
+        @Nonnull
+        private String property;
+
+        private int row;
+
+        @Nonnull
+        private String filename;
+
+        /**
+         * @param propertyVal Property name
+         * @param rowVal      number
+         * @param filenameVal Name of file
+         */
+<span class="fc" id="L115">        UsageLocation(@Nonnull final String propertyVal, final int rowVal, @Nonnull final String filenameVal) {</span>
+<span class="fc" id="L116">            property = propertyVal;</span>
+<span class="fc" id="L117">            row = rowVal;</span>
+<span class="fc" id="L118">            filename = filenameVal;</span>
+<span class="fc" id="L119">        }</span>
+
+        @Nonnull
+        public String getProperty() {
+<span class="fc" id="L123">            return property;</span>
+        }
+
+        int getRow() {
+<span class="fc" id="L127">            return row;</span>
+        }
+
+        @Nonnull
+        String getFilename() {
+<span class="fc" id="L132">            return filename;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>
