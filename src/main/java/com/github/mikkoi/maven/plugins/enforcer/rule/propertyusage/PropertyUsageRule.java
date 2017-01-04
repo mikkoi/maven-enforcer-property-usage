@@ -1,24 +1,5 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.UsageLocation;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
@@ -79,8 +60,9 @@ public final class PropertyUsageRule implements EnforcerRule {
     Log log;
 
     //
-    // Following variables match the configuration items and are populated by Maven/Enforcer,
-    // despite being private. (!) I'm not sure I want to known how it happens.
+    // Following variables match the configuration items
+    // and are populated by Maven/Enforcer, despite being private. (!)
+    // I'm not sure I want to known how it happens.
     //
 
     /**
@@ -115,7 +97,8 @@ public final class PropertyUsageRule implements EnforcerRule {
     private String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
 
     /**
-     * Replace template property name placeholder with this when searching for properties.
+     * Replace template property name placeholder with this
+     * when searching for properties.
      */
     @Nonnull
     private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;//NOPMD
@@ -206,7 +189,8 @@ public final class PropertyUsageRule implements EnforcerRule {
                 definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithoutCount(propertyFilenames);
             }
 
-            // Get all the fileSpecs to check for property usage. Normally **/*.java, maybe **/*.jsp, etc.
+            // Get all the fileSpecs to check for property usage.
+            // Normally **/*.java, maybe **/*.jsp, etc.
             final Collection<String> usageFilenames = FileSpecs.getAbsoluteFilenames(usages, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
 
@@ -291,13 +275,16 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     /**
-     * If your rule is cacheable, you must return a unique id when parameters or conditions
-     * change that would cause the result to be different. Multiple cached results are stored
+     * If your rule is cacheable, you must return a unique id
+     * when parameters or conditions change that would cause
+     * the result to be different. Multiple cached results are stored
      * based on their id.
      * <p>
-     * The easiest way to do this is to return a hash computed from the values of your parameters.
+     * The easiest way to do this is to return a hash computed
+     * from the values of your parameters.
      * <p>
-     * If your rule is not cacheable, then the result here is not important, you may return anything.
+     * If your rule is not cacheable, then the result here
+     * is not important, you may return anything.
      *
      * @return Always false here.
      */
@@ -308,10 +295,11 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     /**
-     * This tells the system if the results are cacheable at all. Keep in mind that during
-     * forked builds and other things, a given rule may be executed more than once for the same
-     * project. This means that even things that change from project to project may still
-     * be cacheable in certain instances.
+     * This tells the system if the results are cacheable at
+     * all. Keep in mind that during forked builds and other things,
+     * a given rule may be executed more than once for the same
+     * project. This means that even things that change from
+     * project to project may still be cacheable in certain instances.
      *
      * @return Always false here.
      */
@@ -321,11 +309,12 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     /**
-     * If the rule is cacheable and the same id is found in the cache, the stored results
-     * are passed to this method to allow double checking of the results. Most of the time
-     * this can be done by generating unique ids, but sometimes the results of objects returned
-     * by the helper need to be queried. You may for example, store certain objects in your rule
-     * and then query them later.
+     * If the rule is cacheable and the same id is found in the cache,
+     * the stored results are passed to this method to allow double
+     * checking of the results. Most of the time this can be done
+     * by generating unique ids, but sometimes the results of objects returned
+     * by the helper need to be queried. You may for example, store certain
+     * objects in your rule and then query them later.
      *
      * @param arg0 EnforcerRule
      * @return Always false here.
