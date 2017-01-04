@@ -280,9 +280,9 @@ public final class PropertyUsageRule implements EnforcerRule {
         }
 
         // Fail rule if errors in wanted categories.
-        if ((definedPropertiesAreUsed && !propertiesNotUsed.isEmpty())
-                || (usedPropertiesAreDefined && !propertiesNotDefined.isEmpty())
-                || (definitionsOnlyOnce && !propertiesDefinedMoreThanOnce.isEmpty())
+        if (definedPropertiesAreUsed && !propertiesNotUsed.isEmpty()
+                || usedPropertiesAreDefined && !propertiesNotDefined.isEmpty()
+                || definitionsOnlyOnce && !propertiesDefinedMoreThanOnce.isEmpty()
                 ) {
             throw new EnforcerRuleException(
                     "Errors in property definitions or usage!"
