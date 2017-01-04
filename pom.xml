@@ -902,10 +902,14 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <name>OWASP Dependency Check</name>
+                    <skipTestScope>true</skipTestScope>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
-                            <report>aggregate</report>
+                            <report>check</report>
                         </reports>
                     </reportSet>
                 </reportSets>

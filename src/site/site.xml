@@ -4,7 +4,7 @@
         xmlns="http://maven.apache.org/DECORATION/1.7.0"
         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0
         http://maven.apache.org/xsd/decoration-1.7.0.xsd"
-        name="Maven Enforcer Char Set Encoding" combine.self="merge">
+        name="Maven Enforcer Rule: Property Usage" combine.self="merge">
     <bannerLeft>
         <name>Maven Enforcer Rule Property Usage</name>
         <href>#</href>
