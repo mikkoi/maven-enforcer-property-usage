@@ -5,23 +5,28 @@
         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0
         http://maven.apache.org/xsd/decoration-1.7.0.xsd"
         name="Maven Enforcer Rule: Property Usage" combine.self="merge">
+
     <bannerLeft>
-        <name>Maven Enforcer Rule Property Usage</name>
+        <name>Maven Enforcer Rule: Property Usage</name>
         <href>#</href>
     </bannerLeft>
 
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.0</version><!-- Maintain older version for compatibility -->
     </skin>
+
     <custom>
         <fluidoSkin>
             <topBarEnabled>false</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
-
+            <googleSearch>
+                <sitesearch/>
+            </googleSearch>
+            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
             <gitHub>
-                <projectId>github/mikkoi</projectId>
+                <projectId>mikkoi/maven-enforcer-property-usage</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>black</ribbonColor>
             </gitHub>
@@ -29,12 +34,7 @@
     </custom>
 
     <body>
-        <head>
-            <!-- because the structure is not flat we must use absolute urls -->
-            <link rel="stylesheet" href="site.css" type="text/css" />
-        </head>
-
-        <menu name="Maven Enforcer Rule: Character Set Encoding">
+        <menu name="Maven Enforcer Rule: Property Usage">
             <item name="About" href="index.html"/>
             <item name="Quickstart" href="quickstart.html"/>
             <item name="Configuration" href="configuration.html"/>
