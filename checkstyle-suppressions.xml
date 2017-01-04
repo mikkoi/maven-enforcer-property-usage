@@ -3,10 +3,9 @@
         "-//Puppy Crawl//DTD Suppressions 1.1//EN"
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <!--<suppress files="com/github/mikkoi/maven/plugins/enforcer/rule/charsetencoding/FileResult.java" checks="JavadocVariable"/>-->
-    <!--<suppress files="com/github/mikkoi/maven/plugins/enforcer/rule/charsetencoding/FileResult.java" checks="JavadocMethod"/>-->
     <!-- suppress all checks on all files in a package -->
     <!--<suppress files="." checks=".*"/>-->
+
     <!-- suppress certain checks on all files -->
     <suppress files="." checks="LineLengthCheck"/>
     <!--<suppress files="." checks="ExplicitInitializationCheck"/>-->
