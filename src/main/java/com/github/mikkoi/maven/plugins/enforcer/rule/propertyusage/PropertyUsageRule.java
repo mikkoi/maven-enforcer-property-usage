@@ -38,10 +38,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +59,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Properties which were defined more than once.
      */
     @Nonnull
-    private final Map<String, Integer> propertiesDefinedMoreThanOnce = new HashMap<>();
+    private final Map<String, Integer> propertiesDefinedMoreThanOnce = new ConcurrentHashMap<>();
 
     /**
      * Properties which were not found in usages.
@@ -215,7 +215,7 @@ public final class PropertyUsageRule implements EnforcerRule {
             final UsageFiles usageFiles = new UsageFiles(log);
             if (definedPropertiesAreUsed) {
                 log.debug("definedPropertiesAreUsed");
-                final Map<String,String> readyTemplates = new HashMap<>();
+                final Map<String,String> readyTemplates = new ConcurrentHashMap<>();
                 templates.forEach(tpl -> definedProperties.forEach(
                         (propertyDefinition, nrPropertyDefinitions) ->
                                 readyTemplates.put(
