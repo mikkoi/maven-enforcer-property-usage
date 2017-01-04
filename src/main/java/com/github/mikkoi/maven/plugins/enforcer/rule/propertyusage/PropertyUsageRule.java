@@ -76,7 +76,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     /**
      * Logger given by Maven Enforcer.
      */
-    Log log = null;
+    Log log;
 
     //
     // Following variables match the configuration items and are populated by Maven/Enforcer,
