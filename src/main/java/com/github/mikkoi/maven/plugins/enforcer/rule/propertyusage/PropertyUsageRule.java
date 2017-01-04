@@ -80,18 +80,18 @@ public final class PropertyUsageRule implements EnforcerRule {
 
     //
     // Following variables match the configuration items and are populated by Maven/Enforcer,
-    // despite being private.
+    // despite being private. (!) I'm not sure I want to known how it happens.
     //
 
     /**
      * Character encoding for source (usage) files.
      */
-    private String sourceEncoding = DEFAULT_CHAR_SET.toString();
+    private String sourceEncoding = DEFAULT_CHAR_SET.toString();//NOPMD
 
     /**
      * Character encoding for properties files.
      */
-    private String propertiesEncoding = DEFAULT_CHAR_SET.toString();
+    private String propertiesEncoding = DEFAULT_CHAR_SET.toString();//NOPMD
 
     /**
      * Activate definitionsOnlyOnce
@@ -118,7 +118,7 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Replace template property name placeholder with this when searching for properties.
      */
     @Nonnull
-    private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;
+    private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;//NOPMD
 
     /**
      * Definitions
