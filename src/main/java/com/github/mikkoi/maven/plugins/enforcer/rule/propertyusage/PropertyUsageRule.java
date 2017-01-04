@@ -245,11 +245,11 @@ public final class PropertyUsageRule implements EnforcerRule {
                 final Collection<UsageLocation> usageLocations
                         = usageFiles.readAllUsagesFromFiles(usageFilenames, readyTemplates, sourceEnc);
                 usageLocations.forEach(loc -> {
-                    if (!definedProperties.containsKey(loc.getProperty())) {
+                    if (definedProperties.containsKey(loc.getProperty())) {
+                        log.debug("Property " + loc.getProperty() + " defined.");
+                    } else {
                         log.debug("Property " + loc.getProperty() + " not defined.");
                         propertiesNotDefined.add(loc);
-                    } else {
-                        log.debug("Property " + loc.getProperty() + " defined.");
                     }
                 });
             }
