@@ -22,7 +22,7 @@ env:
   - secure: ppJJehhPBhDH89ZjRl2ibqZG5PNJvJbzZggWsJWRQVGvPKRZoJIoCOnd16Y+KNZSBJ3j5ig2IePTEIS1yzr4o8YZIXQo5MePWiG8g1ITcJgSmZI4IzTXv7ceB7wICnBMUB/M23KRzWd4G7CMM414zQg1fbJHyz+4Wmrss+unueN1+appbCGAmNRir4nov5+iIQcQD+2Pgp6hq1wIiciJDWbQZfZPc0lckg/JZqVrJ9+258MCaSBuVhqB6jzkVLtSHn/2HFNMD+LVxN+v/8ZGcnYOpNuEu6iR9G5H2eE9GxTW7rt/QfPaklK4/qb83MfK4MB/cPw/n/2dngCmYNTZ3WQ6H70czbzsUTduUqgucw/BknuuiykiuqRToXc2jU96571+V5aO2HDxIs8F4S0HNvfZ1SBu25DSBthxNyZSSm664k+I7XAMzxFtQU5zqjjDZCXZQrSkMcsr+SKAncpv+w6ND1+PC4maG/ee0je0WXyrsHKLQZCpeoaBXbhnf9QWDCriWaH2A7NY3qj17HGke0/eM1jjQoA4inSseR9ZK64UfAJAiaKETfY81mIP6jo+ZKzjwc3LGdkpX8AY/w7fkfkn53gmbf3VkEjPR1rHodv7KcW8zXcg+YrrRBzn/CR/3uJ/jSloC3XsWishyxGwFkitNdB8cAo6Xar7Rr/r7Lk=
 after_success:
 - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master"
-- mvn site
+- mvn --activate-profiles site-heavy site
 - git reset --hard HEAD
 - git clean -d --force
 - rev="$(git rev-parse --short HEAD)"

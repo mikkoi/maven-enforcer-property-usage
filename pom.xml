@@ -76,6 +76,8 @@
     </developers>
 
     <properties>
+        <generateReports>false</generateReports>
+        <generateProjectInfo>false</generateProjectInfo>
         <enforcer.api.version>1.4.1</enforcer.api.version>
         <maven.version>2.0.9</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -391,8 +393,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
-                    <generateProjectInfo>false</generateProjectInfo><!-- use profile site-heavy -->
-                    <generateReports>false</generateReports>        <!-- use profile site-heavy -->
+                    <generateProjectInfo>${generateProjectInfo}</generateProjectInfo><!-- use profile site-heavy -->
+                    <generateReports>${generateReports}</generateReports>        <!-- use profile site-heavy -->
                     <generateSitemap>true</generateSitemap>
                     <locales>en</locales>
                     <generateProjectInfo>false</generateProjectInfo>
@@ -841,6 +843,11 @@
 
         <profile>
             <id>site-heavy</id>
+            <properties>
+                <generateReports>true</generateReports>
+                <generateProjectInfo>true</generateProjectInfo>
+            </properties>
+
             <reporting>
                 <plugins>
                     <plugin>
