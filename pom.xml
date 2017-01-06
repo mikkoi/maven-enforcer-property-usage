@@ -31,7 +31,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/mikkoi/maven-enforcer-property-usage.git</connection>
-        <developerConnection>scm:git:ssh://github.com:mikkoi/maven-enforcer-property-usage.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:mikkoi/maven-enforcer-property-usage.git</developerConnection>
         <tag>HEAD</tag>
         <url>https://github.com/mikkoi/maven-enforcer-property-usage</url>
     </scm>
