@@ -51,7 +51,7 @@
                 
                     
                   <li id="publishDate">Last Published: 2017-01-06</li>
-                  <li class="divider">|</li> <li id="projectVersion">Version: 0.0.1-SNAPSHOT</li>
+                  <li class="divider">|</li> <li id="projectVersion">Version: 0.0.2-SNAPSHOT</li>
                       
                 
                     
@@ -277,7 +277,7 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.674</td></tr></table><br />
+<td>0.941</td></tr></table><br />
 <p>Note: failures are anticipated and checked for with assertions while errors are unanticipated.</p><br /></div>
 <div class="section">
 <h2><a name="Package_List"></a>Package List</h2><a name="Package_List"></a>
@@ -298,7 +298,7 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.368</td></tr>
+<td>0.527</td></tr>
 <tr class="a">
 <td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration">com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration</a></td>
 <td>2</td>
@@ -306,7 +306,7 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.306</td></tr></table><br />
+<td>0.414</td></tr></table><br />
 <p>Note: package statistics are not computed recursively, they only sum up all of its testsuites numbers.</p>
 <div class="section">
 <h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage"></a>com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage"></a>
@@ -321,15 +321,6 @@ function toggleDisplay(elementId) {
 <th>Success Rate</th>
 <th>Time</th></tr>
 <tr class="b">
-<td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusageTestPropertyUsageRule"><img src="images/icon_success_sml.gif" alt="" /></a></td>
-<td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusageTestPropertyUsageRule">TestPropertyUsageRule</a></td>
-<td>14</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.363</td></tr>
-<tr class="a">
 <td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusagePropertyFilesTest"><img src="images/icon_success_sml.gif" alt="" /></a></td>
 <td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusagePropertyFilesTest">PropertyFilesTest</a></td>
 <td>4</td>
@@ -337,7 +328,16 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.005</td></tr></table></div>
+<td>0.024</td></tr>
+<tr class="a">
+<td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusageTestPropertyUsageRule"><img src="images/icon_success_sml.gif" alt="" /></a></td>
+<td><a href="#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusageTestPropertyUsageRule">TestPropertyUsageRule</a></td>
+<td>14</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0.503</td></tr></table></div>
 <div class="section">
 <h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration"></a>com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration"></a>
 <table border="1" class="table table-striped">
@@ -358,25 +358,55 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.306</td></tr></table></div><br /></div>
+<td>0.414</td></tr></table></div><br /></div>
 <div class="section">
 <h2><a name="Test_Cases"></a>Test Cases</h2><a name="Test_Cases"></a>
 <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p>
+<div class="section">
+<h3><a name="FileSpecsTest"></a>FileSpecsTest</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configurationFileSpecsTest"></a>
+<table border="1" class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecsTest.getFilenamesFromFileSpecs_noFiles"></a>getFilenamesFromFileSpecs_noFiles</td>
+<td>0.203</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecsTest.getFilenamesFromFileSpecs"></a>getFilenamesFromFileSpecs</td>
+<td>0.036</td></tr></table></div>
+<div class="section">
+<h3><a name="PropertyFilesTest"></a>PropertyFilesTest</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusagePropertyFilesTest"></a>
+<table border="1" class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_Normal"></a>readPropertiesFromFiles_Normal</td>
+<td>0.002</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_EmptyFilesAreOK"></a>readPropertiesFromFiles_EmptyFilesAreOK</td>
+<td>0.001</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromTestPropertyFile"></a>readPropertiesFromTestPropertyFile</td>
+<td>0.019</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" alt="" /></td>
+<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_ExceptionBecauseFileNotExists"></a>readPropertiesFromFiles_ExceptionBecauseFileNotExists</td>
+<td>0</td></tr></table></div>
 <div class="section">
 <h3><a name="TestPropertyUsageRule"></a>TestPropertyUsageRule</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusageTestPropertyUsageRule"></a>
 <table border="1" class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleUsedFail3"></a>testPropertyUsageRuleUsedFail3</td>
-<td>0.166</td></tr>
+<td>0.29</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testDefaultValues"></a>testDefaultValues</td>
-<td>0</td></tr>
+<td>0.001</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedFail1"></a>testPropertyUsageRuleDefinedFail1</td>
-<td>0.009</td></tr>
+<td>0.026</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedFail2"></a>testPropertyUsageRuleDefinedFail2</td>
@@ -384,27 +414,27 @@ function toggleDisplay(elementId) {
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedFail_Wildcard1"></a>testPropertyUsageRuleDefinedFail_Wildcard1</td>
-<td>0.044</td></tr>
+<td>0.06</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedFail_Wildcard2"></a>testPropertyUsageRuleDefinedFail_Wildcard2</td>
-<td>0.083</td></tr>
+<td>0.074</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinitionsOnlyOnceOk"></a>testPropertyUsageRuleDefinitionsOnlyOnceOk</td>
-<td>0.001</td></tr>
+<td>0.009</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedOk2"></a>testPropertyUsageRuleDefinedOk2</td>
-<td>0</td></tr>
+<td>0.003</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedOk3"></a>testPropertyUsageRuleDefinedOk3</td>
-<td>0.003</td></tr>
+<td>0.002</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinitionsOnlyOnceFail"></a>testPropertyUsageRuleDefinitionsOnlyOnceFail</td>
-<td>0.029</td></tr>
+<td>0.011</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleDefinedOk"></a>testPropertyUsageRuleDefinedOk</td>
@@ -412,45 +442,15 @@ function toggleDisplay(elementId) {
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleUsedOk1"></a>testPropertyUsageRuleUsedOk1</td>
-<td>0.003</td></tr>
+<td>0.004</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleUsedOk2"></a>testPropertyUsageRuleUsedOk2</td>
-<td>0.003</td></tr>
+<td>0.002</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" alt="" /></td>
 <td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.TestPropertyUsageRule.testPropertyUsageRuleUsedOk3"></a>testPropertyUsageRuleUsedOk3</td>
-<td>0.005</td></tr></table></div>
-<div class="section">
-<h3><a name="PropertyFilesTest"></a>PropertyFilesTest</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusagePropertyFilesTest"></a>
-<table border="1" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_Normal"></a>readPropertiesFromFiles_Normal</td>
-<td>0</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_EmptyFilesAreOK"></a>readPropertiesFromFiles_EmptyFilesAreOK</td>
-<td>0</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromTestPropertyFile"></a>readPropertiesFromTestPropertyFile</td>
-<td>0.004</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFilesTest.readPropertiesFromFiles_ExceptionBecauseFileNotExists"></a>readPropertiesFromFiles_ExceptionBecauseFileNotExists</td>
-<td>0.001</td></tr></table></div>
-<div class="section">
-<h3><a name="FileSpecsTest"></a>FileSpecsTest</h3><a name="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configurationFileSpecsTest"></a>
-<table border="1" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecsTest.getFilenamesFromFileSpecs_noFiles"></a>getFilenamesFromFileSpecs_noFiles</td>
-<td>0.144</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" alt="" /></td>
-<td><a name="TC_com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecsTest.getFilenamesFromFileSpecs"></a>getFilenamesFromFileSpecs</td>
-<td>0.014</td></tr></table></div><br /></div>
+<td>0.002</td></tr></table></div><br /></div>
                   </div>
             </div>
           </div>
