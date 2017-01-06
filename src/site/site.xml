@@ -7,8 +7,8 @@
         name="Maven Enforcer Rule: Property Usage" combine.self="merge">
 
     <bannerLeft>
-        <name>Maven Enforcer Rule: Property Usage</name>
-        <href>#</href>
+        <name>${project.name}</name>
+        <href>${project.url}</href>
     </bannerLeft>
 
     <skin>
@@ -35,9 +35,9 @@
 
     <body>
         <menu name="Maven Enforcer Rule: Property Usage">
-            <item name="About" href="index.html"/>
-            <item name="Quickstart" href="quickstart.html"/>
+            <item name="Introduction" href="index.html"/>
             <item name="Configuration" href="configuration.html"/>
+            <item name="Usage" href="usage.html"/>
         </menu>
 
         <menu ref="reports"/>

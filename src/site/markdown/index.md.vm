@@ -1,18 +1,27 @@
-Maven Enforcer Plugin Rule: Property Usage
-==========================================
+${project.name}
+===
 
 [Maven Enforcer Plugin](http://maven.apache.org/enforcer/maven-enforcer-plugin/)
 provides goals to control certain environmental constraints such as Maven version,
 JDK version and OS family along with many more standard rules and user created rules.
 
-`${project.artifactId}` is a user created [custom rule](https://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
+This project, artifact `${project.artifactId}`, is a user created
+[custom rule](https://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
 to verify the usage of defined properties in the source files of the build.
 
-It often happens during development that properties are defined and used,
-and then taken out of use but definition is forgotten; it gets "left behind"
-in the `resources/*.properties` file. This plugin checks that all the defined
-properties are used.
+Rationale
+---
 
-* For a quick adoption of the Enforcer rule, check the [Quickstart](quickstart.html) page.
-* To know more about the rule's configuration and parameters check the [Usage page](usage.html).
+It often happens during development that different properties are defined and used,
+and then taken out of use but definition is forgotten; they get "left behind"
+in the `resources/*.properties` file. This Maven Enforcer rule allows the build
+to verify these following:
+
+    - All properties which are defined in properties files, are also used in the source code.
+    - All properties used in the source code are also defined in properties files.
+    - No property is defined more than once in properties files.
+    - When used properties are extracted from the source code, rules can be set for a property name, and thereby force a project policy.
+
+* For a quick adoption of the Enforcer rule, check the [Usage](usage.html) page.
+* To know more about the rule's configuration and parameters check the [Configuration page](configuration.html).
 * Released builds are available from [Maven Central](https://search.maven.org/).

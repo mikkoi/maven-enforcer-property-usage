@@ -8,12 +8,12 @@
     <artifactId>property-usage-rule</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Maven Enforcer Property Usage</name>
-    <description>Maven Enforcer Plugin (org.apache.maven.plugins:maven-enforcer-plugin) rule:
+    <name>Maven Enforcer Plugin, Custom Rule: Property Usage</name>
+    <description>Maven Enforcer Plugin (org.apache.maven.plugins:maven-enforcer-plugin) custom rule:
         Ensure that all the Java properties defined in resources .properties files
         are also used in code.
     </description>
-    <url>https://github.com/mikkoi/maven-enforcer-property-usage</url>
+    <url>https://mikkoi.github.io/maven-enforcer-property-usage</url>
     <inceptionYear>2016</inceptionYear>
 
     <licenses>
@@ -46,6 +46,13 @@
         <url>http://www.linkedin.com/in/mikkokoivunalho/</url>
     </organization>
 
+    <distributionManagement><!-- Jar distributionManagement under profile release. -->
+        <site>
+            <id>maven-enforcer-property-usage.website</id>
+            <name>Maven Enforcer Rule: Property Usage</name>
+            <url>https://mikkoi.github.io/maven-enforcer-property-usage/</url>
+        </site>
+    </distributionManagement>
     <developers>
         <developer>
             <id>mikkoi</id>
@@ -383,6 +390,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <generateProjectInfo>false</generateProjectInfo><!-- use profile site-heavy -->
+                    <generateReports>false</generateReports>        <!-- use profile site-heavy -->
+                    <generateSitemap>true</generateSitemap>
+                    <locales>en</locales>
+                    <generateProjectInfo>false</generateProjectInfo>
+                    <validate>false</validate>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -823,14 +838,66 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>site-heavy</id>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-linkcheck-plugin</artifactId>
+                        <configuration>
+                            <excludedLinks>
+                                <!--<excludedLink>**/archetype/*</excludedLink>-->
+                            </excludedLinks>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-changes-plugin</artifactId>
+                        <version>2.12</version>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>github-report</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <name>OWASP Dependency Check</name>
+                            <skipTestScope>true</skipTestScope>
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>check</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
     </profiles>
 
     <reporting>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -841,10 +908,6 @@
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -860,15 +923,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-linkcheck-plugin</artifactId>
-                <configuration>
-                    <excludedLinks>
-                        <!--<excludedLink>**/archetype/*</excludedLink>-->
-                    </excludedLinks>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
             </plugin>
             <plugin>
@@ -880,18 +934,6 @@
                 <artifactId>maven-changelog-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-changes-plugin</artifactId>
-                <version>2.12</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>github-report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <reportSets>
@@ -899,21 +941,6 @@
                         <reports>
                             <!-- select non-aggregate reports -->
                             <report>report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <name>OWASP Dependency Check</name>
-                    <skipTestScope>true</skipTestScope>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>check</report>
                         </reports>
                     </reportSet>
                 </reportSets>

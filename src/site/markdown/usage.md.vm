@@ -1,8 +1,6 @@
-Quickstart Guide
-================
+# Usage
 
-Configuring the plugin
-----------------------
+## Configuring the plugin
 
 Add the following to your project's `pom.xml` file:
 
