@@ -786,6 +786,10 @@
         </profile>
 
         <profile>
+            <!-- Instructions -->
+            <!-- Bump version to full -->
+            <!-- Make tag in Github (maven-release-plugin) -->
+            <!-- mvn -activate-profiles ossrh,release deploy -->
             <id>release</id>
             <distributionManagement>
                 <downloadUrl>
