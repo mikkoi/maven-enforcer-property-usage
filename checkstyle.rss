@@ -19,9 +19,9 @@ under the License.
 -->
 <rss version="0.91">
   <channel>
-    <title>Maven Enforcer Property Usage - Checkstyle report</title>
-    <link>https://github.com/mikkoi/maven-enforcer-property-usage</link>
-    <description>Maven Enforcer Property Usage - Checkstyle report</description>
+    <title>Maven Enforcer Plugin, Custom Rule: Property Usage - Checkstyle report</title>
+    <link>https://mikkoi.github.io/maven-enforcer-property-usage</link>
+    <description>Maven Enforcer Plugin, Custom Rule: Property Usage - Checkstyle report</description>
     <language>en-us</language>
     <copyright>&#169;2016 - 2017 Private</copyright>
     <item>
@@ -30,9 +30,9 @@ under the License.
              Warnings: 0,
              Infos: 0
       </title>
-            <link>https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html</link>
+            <link>https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html</link>
       <description>
-        <p>Click <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -46,7 +46,7 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Definitions.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Definitions.java</a>
                 </td>
                 <td>
                   0
@@ -60,7 +60,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.java</a>
                 </td>
                 <td>
                   0
@@ -74,7 +74,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFiles.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/PropertyFiles.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyFiles.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/PropertyFiles.java</a>
                 </td>
                 <td>
                   0
@@ -88,7 +88,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.package-info.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/package-info.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.package-info.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -102,7 +102,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/UsageFiles.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.UsageFiles.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/UsageFiles.java</a>
                 </td>
                 <td>
                   0
@@ -116,7 +116,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/PropertyUsageRule.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/PropertyUsageRule.java</a>
                 </td>
                 <td>
                   0
@@ -130,7 +130,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Templates.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Templates.java</a>
                 </td>
                 <td>
                   0
@@ -144,7 +144,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/mikkoi/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Usages.java</a>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Usages.java</a>
                 </td>
                 <td>
                   0
