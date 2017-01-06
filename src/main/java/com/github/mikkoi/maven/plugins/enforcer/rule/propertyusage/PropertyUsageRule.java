@@ -88,7 +88,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     /**
      * Activate usedPropertiesAreDefined
      */
-    private boolean usedPropertiesAreDefined = true;
+    private boolean usedPropertiesAreDefined = false;
 
     /**
      * Replace this string with property name in template(s).

@@ -374,7 +374,7 @@ public final class TestPropertyUsageRule {
         PropertyUsageRule rule = new PropertyUsageRule();
         assertEquals("Default definitionsOnlyOnce is true.", true, rule.isDefinitionsOnlyOnce());
         assertEquals("Default definedPropertiesAreUsed is true.", true, rule.isDefinedPropertiesAreUsed());
-        assertEquals("Default usedPropertiesAreDefined is true.", true, rule.isUsedPropertiesAreDefined());
+        assertEquals("Default usedPropertiesAreDefined is false.", false, rule.isUsedPropertiesAreDefined());
         assertEquals("Default replaceInTemplateWithPropertyName is correct.", "REPLACE_THIS", rule.getReplaceInTemplateWithPropertyName());
         assertEquals("Default definitions are correct.", Collections.singleton("src/main/resources/**/*.properties"), rule.getDefinitions());
         assertEquals("Default templates are correct.", Collections.singleton("\"REPLACE_THIS\""), rule.getTemplates());

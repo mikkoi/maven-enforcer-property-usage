@@ -20,12 +20,12 @@ in the files in `<usage>` element.
 
 Default value is *true*.
 
-* `<definedPropertiesAreUsed>`, boolean
+* `<usedPropertiesAreDefined>`, boolean
 
 If this value is set, rule checks that all the properties used
 in the files in `<usage>` element are also defined in properties files.
 
-Default value is true.
+Default value is false.
 
 
 Environment
