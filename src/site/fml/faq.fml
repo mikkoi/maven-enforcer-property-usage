@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<faqs xmlns="http://maven.apache.org/FML/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/FML/1.0 http://maven.apache.org/xsd/fml-1.0.xsd" id="FAQ" title="Frequently Asked Questions">
+  <part id="General">
+    <title>General</title>
+    <faq id="Regular expressions">
+      <question>The documentation of java.util.regex.Pattern does not say enough about regular expressions.</question>
+      <answer>
+        <p>
+            Please see <a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a>.
+        </p>
+      </answer>
+    </faq>
+    <faq id="This rule is useful but not exactly what I need.">
+      <question>This rule is useful but not exactly what I need.</question>
+      <answer>
+        <p>
+          Ok. Maybe we can extend it. Please contact the programmer.
+        </p>
+      </answer>
+    </faq>
+    <!-- mention docbook explicitly so google can find this -->
+    <faq id="There is a bug in the code or the documentation.">
+      <question>There is a bug in the code or the documentation</question>
+      <answer>
+        <p>
+            Quite possible. Would you like to help to fix it?
+            Please contact the programmer, or just fork the repository
+            in Github and make a pull request. Thank you.
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>

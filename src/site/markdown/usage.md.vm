@@ -1,9 +1,12 @@
-# Usage
+Usage
+===
 
-## Configuring the plugin
+Using with Maven Enforcer
+---
 
 Add the following to your project's `pom.xml` file:
 
+    ...
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -22,28 +25,9 @@ Add the following to your project's `pom.xml` file:
                 <configuration>
                     <rules>
                         <useAllProperties implementation="com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.PropertyUsageRule">
-                            <definedPropertiesAreUsed/>
-                            <definition>
-                                <!-- The files from which to read the used properties. -->
-                                <!-- default: src/main/resources/*.properties -->
-                                <!-- File is always used as a regular expression. -->
-                                <!-- When directory, all files are checked recursively. -->
-                                <files>
-                                    <file></file>
-                                </file>
-                            </definition>
-                            <templates>
-                                <!-- The usage templates. -->
-                                <!-- default: property name as it is in *.properties files -->
-                                <template></template>
-                            </templates>
-                            <source>
-                                <!-- The files to check for the used properties. -->
-                                <!-- default: src/main/java -->
-                                <!-- File is always used as a regular expression. -->
-                                <!-- When directory, all files are checked recursively. -->
-                                <file></file>
-                            </source>
+                            <definitionsOnlyOnce>true</definitionsOnlyOnce>
+                            <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
+                            <usedPropertiesAreDefined>false</usedPropertiesAreDefined>
                         </useAllProperties>
                     </rules>
                     <!-- Fail build if wrong encoding encountered. -->
@@ -52,5 +36,20 @@ Add the following to your project's `pom.xml` file:
             </execution>
         </executions>
     </plugin>
+    ...
 
-To know more about plugin's configuration and parameters check the [mojo page](usage.html).
+The Maven Enforcer plugin needs the `<dependencies>` element to access custom rules.
+
+It is good to always use a custom rule in a specific `<execution>` element.
+Within the `<rules>` element, you can give any name to the element which holds
+the `implementation` clause. In this case, it is called *useAllProperties*
+because we specifically want to be sure that all properties
+defined in `src/main/resources/**/*.properties` files are also used in
+source code in `src/main/java/**/*.java` files. These paths are defaults.
+The marking `**/*` means any file in any subdirectory.
+
+The rule has three different functions. These are accessed via the elements
+`<definitionsOnlyOnce>`, `<definedPropertiesAreUsed>` and `<usedPropertiesAreDefined`.
+Here we want the simpliest configuration so we only activate
+`<definitionsOnlyOnce>` and `<definedPropertiesAreUsed>`. Default for all
+is *true*.

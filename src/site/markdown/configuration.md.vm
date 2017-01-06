@@ -1,62 +1,152 @@
 Configuration
-=============
+===
 
 Enforcer rule `${project.artifactId}` has the following configuration parameters:
 
-* `<definedPropertiesAreUsed>`
 
-If this value is set, defined properties must all be used in the files in `<usage>` element.
+Functions
+---
+
+* `<definitionsOnlyOnce>`, boolean
+
+If this value is set, rule checks that no property is defined more than once.
+
+Default value is *true*.
+
+* `<definedPropertiesAreUsed>`, boolean
+
+If this value is set, rule checks that all defined properties must also be used
+in the files in `<usage>` element.
+
+Default value is *true*.
+
+* `<definedPropertiesAreUsed>`, boolean
+
+If this value is set, rule checks that all the properties used
+in the files in `<usage>` element are also defined in properties files.
 
 Default value is true.
 
-* `<definedPropertiesAreUsed>`
 
-If this value is set, all the properties used in the files in `<usage>` element are also defined.
+Environment
+---
 
-Default value is true.
+* `<sourceEncoding>`, string
 
-* `<definitionsOnlyOnce>`
+Use this option to specify a different character set encoding from
+the project encoding if your **source** files do not use the same.
 
-If this value is set, check that no property is defined more than once.
+Default value is `${project.build.sourceEncoding}`.
 
-Default value is true.
+* `<propertiesEncoding>`, string
 
-* `<definitions>`
+Use this option to specify a different character set encoding from
+the project encoding if your **properties** files do not use the same.
 
-The used properties to search for in the files.
-This is a list of `<file>` elements inside element `<files>` to
-read the `.properties` files. `<file>` is a file name, wildcards not supported.
-
-Default value for `<definitions>` is:
-
-    <files>
-        <file>${project.basedir}/src/main/resources/[[:print:]]+\.properties</file>
-    </file>
+Default value is `${project.build.sourceEncoding}`.
 
 
-* `<templates>`
+Property Definition and Usage files
+---
 
-`<templates>` contains a list of `<template>` items. Template is
+* `<definitions>`, list of strings
+
+Element `<definitions>` contains a list of `<file>` elements.
+These are the properties files
+to read for the defined properties.
+`<file>` is a file path or
+directory path, wildcards are supported.
+
+Base directory is the current project `${project.basedir}`.
+You can also use absolute paths if you need to define
+file paths outside the project structure.
+
+Default value is `<file>src/main/resources/**/*.properties</file>`.
+Syntax "**/*.properties" means: all files ending with ".properties"
+in all directories and subdirectories regardless of depth.
+
+* `<usages>`, list of strings
+
+Element `<usages>` contains a list of `<file>` elements.
+`<file>` is a file path or directory path, wildcards are supported.
+These are the files to search for usages of the defined properties,
+or for patterns for the undefined properties to extract their names.
+
+Base directory is the current project `${project.basedir}`.
+You can also use absolute paths if you need to define
+file paths outside the project structure.
+
+Default value is `<file>src/main/java/**/*.java</file>`.
+
+
+Configuration of Templates
+---
+
+The templates are the most difficult configuration options.
+They control how the rule reads the source code and
+finds or extracts property usages.
+
+* `<propertyNameRegexp>`, string
+
+This option specifies what a property name looks like. It is
+a regular expression.
+
+Default value is `([a-z0-9\-\.]{1,}?)`.
+It means that a property name can contain any alphanumerical character
+(all lowercase characters and all digits), the dash '-' and a period '.'.
+It is at least 1 character long. If you have specified the character encoding
+as `UTF-8` (Unicode) in your project or the rule's configuration,
+then alphabetic characters will also include all unicode
+alphabetics, not just ASCII (7-bit) alphabetic characters.
+Notice that the regular expression is enclosed into a parenthesis '()'.
+This means that it is a group and it can be extracted from the code
+around it. The question mark '?' before the closing parentheses
+means to match "greedily".
+Please consult documentation for Java class [Pattern]
+(https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) for
+more information on regular expressions.
+
+All the properties defined in properties files should match this definition.
+However, it is mandatory only when option `<usedPropertiesAreDefined>` is
+turned on.
+
+* `replaceInTemplateWithPropertyName`, string
+
+This option specifies the placeholder inside template strings
+(element `<templates>`) which will be replaced by
+`<propertyNameRegexp>` when extracting the property names
+from the source, or by the property name when searching for
+usages in the source.
+
+Default value is `REPLACE_THIS`.
+
+* `<templates>`, list of strings
+
+Element `<templates>` contains a list of `<template>` elements. Template is
 a regular expression which we look for in the source files. It is used
-to make a better match with the property name. If, for example,
+to make a match with the property name. If, for example,
 you want to make sure properties are always accessed via an interface,
-you can specify a template for that here. The regular expression can contain
-one group. It is the property name.
+e.g. the *java.util.Properties* class,
+you can specify a template (regular expression) for that.
+The regular expression must contain
+the placeholder, `<replaceInTemplateWithPropertyName>`, by default **REPLACE_THIS**,
+which is used to identify the place of the property name. It must not be
+inside an extracted group.
+Please consult documentation for Java class [Pattern]
+(https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) for
+more information on regular expressions.
 
-Example shows the Spring Framework annotation with default value set:
+The following example shows the (Spring Framework annotation)
+[http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/htmlsingle/spring-framework-reference.html#beans-factory-placeholderconfigurer]
+with default value set:
 
-    <template>@Value\("\$\{([[:print:]]+):[[:print:]]+\}"\)</template>
+    <template>@Value\("\${REPLACE_THOS}"\)</template>
 
-The default template is the property name exactly as it, with only quotation marks around it.
+The default template is the property name exactly as it is, with only quotation marks around it:
 
-    <template>"([[:print:]]+)"</template>
+    <template>"REPLACE_THIS"</template>
 
-* `<usages>`
-
-Only look in files in `<file>` elements. Wildcards not supported.
-If `<file>` is a directory, check recursively all files.
-
-Default value:
-
-    <file>${project.basedir}/src/main/java</file>
-
+This is very simple, and will work only with option `<definedPropertiesAreUsed>`.
+With option `<usedPropertiesAreDefined>` this would not be enough because
+it would make Enforcer think that every quoted string in the program is a property,
+which would very unlikely be true.

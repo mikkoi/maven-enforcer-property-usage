@@ -19,7 +19,7 @@ no property is defined more than once.
 * [SonarQube Reports](https://sonarqube.com/dashboard/index/com.github.mikkoi.maven.enforcer.rule:property-usage-rule)
 * [![Build Status](https://travis-ci.org/mikkoi/maven-enforcer-property-usage.svg?branch=master)](https://travis-ci.org/mikkoi/maven-enforcer-property-usage)
 
-## Quickstart
+## Quick Start
 
 Add the following to your project's `pom.xml` file:
 
@@ -47,7 +47,7 @@ Add the following to your project's `pom.xml` file:
                             <propertiesEncoding>UTF-8</propertiesEncoding>
                             <definitionsOnlyOnce>true</definitionsOnlyOnce>
                             <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
-                            <usedPropertiesAreDefined>true</usedPropertiesAreDefined>
+                            <usedPropertiesAreDefined>false</usedPropertiesAreDefined>
                             <replaceInTemplateWithPropertyName>REPLACE_THIS</replaceInTemplateWithPropertyName>
                             <propertyNameRegexp>([a-z0-9\-\.]{1,}?)</propertyNameRegexp>
                             <definitions>

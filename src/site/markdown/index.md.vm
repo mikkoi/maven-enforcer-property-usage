@@ -17,11 +17,18 @@ and then taken out of use but definition is forgotten; they get "left behind"
 in the `resources/*.properties` file. This Maven Enforcer rule allows the build
 to verify these following:
 
-    - All properties which are defined in properties files, are also used in the source code.
-    - All properties used in the source code are also defined in properties files.
-    - No property is defined more than once in properties files.
-    - When used properties are extracted from the source code, rules can be set for a property name, and thereby force a project policy.
 
+* All properties which are defined in properties files, are also used in the source code.
+* All properties used in the source code are also defined in properties files.
+* No property is defined more than once in properties files.
+* When used properties are extracted from the source code, a project policy can be forced:
+    * on property name...
+    * on how to access them (via Spring Placeholders, via getProperty, etc.)...
+    * ... via regexp-sentences.
+
+
+---
+
+* To know more about the rule's configuration and parameters, check the [Configuration](configuration.html) page.
 * For a quick adoption of the Enforcer rule, check the [Usage](usage.html) page.
-* To know more about the rule's configuration and parameters check the [Configuration page](configuration.html).
-* Released builds are available from [Maven Central](https://search.maven.org/).
+* Released builds are available from [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.mikkoi.maven.enforcer.rule%22%20a%3A%22property-usage-rule%22).
