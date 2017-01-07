@@ -46,20 +46,6 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Definitions.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  5
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.java</a>
                 </td>
                 <td>
@@ -69,7 +55,21 @@ under the License.
                   0
                 </td>
                 <td>
-                  8
+                  9
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://mikkoi.github.io/maven-enforcer-property-usage/checkstyle.html#com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Definitions.java">com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/Definitions.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
                 </td>
               </tr>
                           <tr>
