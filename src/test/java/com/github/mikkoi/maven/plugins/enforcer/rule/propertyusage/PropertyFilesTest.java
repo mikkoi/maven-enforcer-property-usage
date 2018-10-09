@@ -44,8 +44,7 @@ public class PropertyFilesTest {
                 "src/test/resources/not-exists.properties"
         );
         PropertyFiles propertyFiles = new PropertyFiles(slog, Charset.forName("UTF-8"));
-        Map<String, Integer> properties = propertyFiles.readPropertiesFromFilesWithoutCount(filenames);
-        assertEquals(null, properties);
+        propertyFiles.readPropertiesFromFilesWithoutCount(filenames);
     }
 
     @Test
