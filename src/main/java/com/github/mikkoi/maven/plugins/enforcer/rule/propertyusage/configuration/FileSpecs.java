@@ -18,8 +18,10 @@ import java.util.stream.Collectors;
  */
 public class FileSpecs {
 
-    private FileSpecs() {
-    }
+	private FileSpecs() {
+		// This class cannot be instantiated.
+		throw new AssertionError();
+	}
 
     public static String absoluteCwdAndFile(@Nonnull final String filename) {
         return Paths.get(System.getProperty("user.dir"), filename).toAbsolutePath().normalize().toString();
