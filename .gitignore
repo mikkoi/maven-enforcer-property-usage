@@ -7,3 +7,19 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+/bin/
+
+# Eclipse
+org.eclipse.core.resources.prefs
+.settings
+.classpath
+.factorypath
+.project
+
+# Mac stuff
+.DS_Store
+
+# IntelliJ project
+.idea/
+.iml
+
