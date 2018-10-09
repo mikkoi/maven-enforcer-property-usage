@@ -141,21 +141,23 @@ public final class PropertyUsageRule implements EnforcerRule {
             log.error("Cannot get property 'project.basedir'. Using current working directory. Error:" + e);
         }
 
-        Charset propertiesEnc = DEFAULT_CHAR_SET;
-        Charset sourceEnc = DEFAULT_CHAR_SET;
+        Charset projectBuildSourceEncoding = Charset.forName("UTF-8");
         try {
-            if(StringUtils.isNotBlank(propertiesEncoding)) {
-                propertiesEnc = Charset.forName(propertiesEncoding);
-            } else {
-                propertiesEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
-            }
-            if(StringUtils.isNotBlank(sourceEncoding)) {
-                sourceEnc = Charset.forName(sourceEncoding);
-            } else {
-                sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
-            }
+        	projectBuildSourceEncoding = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
         } catch (ExpressionEvaluationException e) {
             log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
+        }
+        Charset propertiesEnc = DEFAULT_CHAR_SET;
+        Charset sourceEnc = DEFAULT_CHAR_SET;
+        if(StringUtils.isNotBlank(propertiesEncoding)) {
+            propertiesEnc = Charset.forName(propertiesEncoding);
+        } else {
+            propertiesEnc = projectBuildSourceEncoding;
+        }
+        if(StringUtils.isNotBlank(sourceEncoding)) {
+            sourceEnc = Charset.forName(sourceEncoding);
+        } else {
+            sourceEnc = projectBuildSourceEncoding;
         }
 
         log.debug("PropertyUsageRule:execute() - Settings:");
