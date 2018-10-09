@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 /**
  * Verifies for usage of properties mentioned in .properties files.
  */
-@SuppressWarnings("WeakerAccess")
 public final class PropertyUsageRule implements EnforcerRule {
 
     /**
