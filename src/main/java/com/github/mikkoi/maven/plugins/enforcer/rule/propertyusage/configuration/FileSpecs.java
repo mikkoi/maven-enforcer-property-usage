@@ -46,10 +46,12 @@ public class FileSpecs {
             // DirectoryScanner can't handle them (as they may not be in basedir)
             // So we take away all files that exist.
             for (String fileSpec : files) {
-                File file = new File(fileSpec);
-                if (StringUtils.isBlank(fileSpec)) {
+            	if (StringUtils.isBlank(fileSpec)) {
                     log.error(logFileIterationMsg(fileSpec, "is blank. Error in configuration") + "!");
-                } else if (file.exists() && file.isFile()) {
+                    continue;
+                }
+            	File file = new File(fileSpec);
+                if (file.exists() && file.isFile()) {
                     log.debug(logFileIterationMsg(fileSpec, "is a file") + ".");
                     allFilenames.add(file.getAbsolutePath()); // If item is already in Set, discarded automatically.
                 } else if (file.exists() && file.isDirectory()) {
