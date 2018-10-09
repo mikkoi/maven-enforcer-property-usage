@@ -160,13 +160,13 @@ public final class PropertyUsageRule implements EnforcerRule {
 
         log.debug("PropertyUsageRule:execute() - Settings:");
         log.debug("basedir:" + basedir);
-        log.debug("propertiesEnc:" + propertiesEnc.toString());
-        log.debug("sourceEnc:" + sourceEnc.toString());
+        log.debug("propertiesEnc:" + propertiesEnc);
+        log.debug("sourceEnc:" + sourceEnc);
         log.debug("replaceInTemplateWithPropertyName:" + replaceInTemplateWithPropertyName);
         log.debug("propertyNameRegexp:" + propertyNameRegexp);
-        log.debug("definitions:" + definitions.toString());
-        log.debug("templates:" + templates.toString());
-        log.debug("usages:" + usages.toString());
+        log.debug("definitions:" + definitions);
+        log.debug("templates:" + templates);
+        log.debug("usages:" + usages);
 
         try {
             log.debug("PropertyUsageRule:execute() - Run:");
