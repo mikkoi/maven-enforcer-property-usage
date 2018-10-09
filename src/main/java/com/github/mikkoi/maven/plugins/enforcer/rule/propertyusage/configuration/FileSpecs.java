@@ -69,7 +69,7 @@ public class FileSpecs {
                     ds.setIncludes(new String[]{fileSpec});
                     ds.scan();
                     Collection<String> foundFiles = Arrays.stream(ds.getIncludedFiles()).map(includedFile -> Paths.get(basedir.toString(), includedFile).toString()).collect(Collectors.toSet());
-                    log.debug("    Found files:" + foundFiles.toString());
+                    log.debug("    Found files:" + foundFiles);
                     allFilenames.addAll(foundFiles);
                 }
             }
