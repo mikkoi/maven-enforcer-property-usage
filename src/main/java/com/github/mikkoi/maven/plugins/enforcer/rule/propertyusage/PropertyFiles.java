@@ -27,6 +27,11 @@ class PropertyFiles {
 
     private final Charset charset;
 
+    private final Pattern commentLineP = Pattern.compile("^[\\s]{0,}[\\#\\!]{1}.{0,}$");
+    private final Pattern simplePropertyLineP = Pattern.compile("^[\\s]{0,}([^=:]{1,})[=:]{1}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
+    private final Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
+    private final Pattern multiLineP = Pattern.compile("\\\\{1}[\\s]{0,}$");
+
     PropertyFiles(@Nonnull final Log logger, @Nonnull final Charset cset) {
         log = logger;
         charset = cset;
@@ -50,7 +55,7 @@ class PropertyFiles {
                     log.debug("    Reading property " + name + ".");
                     results.put(name, 1);
                 }
-            }
+            } 
         }
         return results;
     }
@@ -62,71 +67,82 @@ class PropertyFiles {
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and how many times they are defined.
      */
+    @Nonnull
+    Map<String, Integer> readPropertiesFromFilesWithCount(@Nonnull final Collection<String> filenames)
+            throws IOException {
+        final Map<String, Integer> results = new HashMap<>();
+        log.debug("commentLineP:" + commentLineP.pattern());
+        log.debug("simplePropertyLineP:" + simplePropertyLineP.pattern());
+        log.debug("simplePropertyLineP:" + simplePropertyLineP.pattern());
+        log.debug("multiLineP:" + multiLineP);
+        for (final String filename : filenames) {
+            log.debug("Reading property file '" + filename + "'.");
+            readPropertiesFromFileWithCount(filename).forEach((key,value) -> results.put(key, value));
+        }
+        return results;
+    }
+
+    /**
+     * Read properties with our own reading routine and count
+     * how many times they are used.
+     *
+     * @param filename File name to read properties from.
+     * @return Map of definitions and how many times they are defined.
+     */
     @SuppressWarnings({
             "squid:S3776", // Cognitive Complexity of methods should not be too high
             "squid:S134",  // Control flow statements "if", "for", "while", "switch" and "try" should not be nested too deeply
             "squid:S135"   // Loops should not contain more than a single "break" or "continue" statement
     })
     @Nonnull
-    Map<String, Integer> readPropertiesFromFilesWithCount(@Nonnull final Collection<String> filenames)
+    Map<String, Integer> readPropertiesFromFileWithCount(@Nonnull final String filename)
             throws IOException {
-        Map<String, Integer> results = new HashMap<>();
-        Pattern commentLineP = Pattern.compile("^[\\s]{0,}[\\#\\!]{1}.{0,}$");
-        log.debug("commentLineP:" + commentLineP.pattern());
-        Pattern simplePropertyLineP = Pattern.compile("^[\\s]{0,}([^=:]{1,})[=:]{1}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
-        log.debug("simplePropertyLineP:" + simplePropertyLineP.pattern());
-        Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
-        log.debug("simplePropertyLineP:" + simplePropertyLineP.pattern());
-        Pattern multiLineP = Pattern.compile("\\\\{1}[\\s]{0,}$");
-        log.debug("multiLineP:" + multiLineP);
-        for (String filename : filenames) {
-            log.debug("Reading property file '" + filename + "'.");
-            List<String> rows = Files.readAllLines(Paths.get(filename), charset);
-            boolean readingMultiLineDefinition = false;
-            for ( String row : rows) {
-                log.debug("    Reading property row '" + row + "'.");
-                Matcher commentLineM = commentLineP.matcher(row);
-                if (commentLineM.find()) {
-                    log.debug("        This is comment line.");
-                    continue;
-                }
-                Matcher multiLineM = multiLineP.matcher(row);
-                if (multiLineM.find()) {
-                    if( readingMultiLineDefinition) {
-                        log.debug("        This is multirow (not first row)");
-                        continue;
-                    } else {
-                        log.debug("        This is multirow (first row).");
-                        readingMultiLineDefinition = true;
-                    }
-                } else {
-                    if( readingMultiLineDefinition) {
-                        log.debug("        This is multirow (last row).");
-                        readingMultiLineDefinition = false;
-                        continue;
-                    }
-                }
-                Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
-                if (simplePropertyLineM.find()) {
-                    log.debug("        This is simple property line.");
-                    final String name = simplePropertyLineM.group(1).trim();
-                    storePropertyName(name, results);
-                    continue;
-                }
-                Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
-                if(notSimplePropertyLineM.find()) {
-                    log.debug("        This is not simple property line.");
-                    final String name = notSimplePropertyLineM.group(1).trim();
-                    storePropertyName(name, results);
-                    continue;
-                }
-                log.debug("        This row matched nothing,  propably empty or multiline continuation.");
+        final Map<String, Integer> results = new HashMap<>();
+        List<String> rows = Files.readAllLines(Paths.get(filename), charset);
+        boolean readingMultiLineDefinition = false;
+        for ( String row : rows) {
+            log.debug("    Reading property row '" + row + "'.");
+            Matcher commentLineM = commentLineP.matcher(row);
+            if (commentLineM.find()) {
+                log.debug("        This is comment line.");
+                continue;
             }
+            Matcher multiLineM = multiLineP.matcher(row);
+            if (multiLineM.find()) {
+                if( readingMultiLineDefinition) {
+                    log.debug("        This is multirow (not first row)");
+                    continue;
+                } else {
+                    log.debug("        This is multirow (first row).");
+                    readingMultiLineDefinition = true;
+                }
+            } else {
+                if( readingMultiLineDefinition) {
+                    log.debug("        This is multirow (last row).");
+                    readingMultiLineDefinition = false;
+                    continue;
+                }
+            }
+            Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
+            if (simplePropertyLineM.find()) {
+                log.debug("        This is simple property line.");
+                final String name = simplePropertyLineM.group(1).trim();
+                storePropertyName(name, results);
+                continue;
+            }
+            Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
+            if(notSimplePropertyLineM.find()) {
+                log.debug("        This is not simple property line.");
+                final String name = notSimplePropertyLineM.group(1).trim();
+                storePropertyName(name, results);
+                continue;
+            }
+            log.debug("        This row matched nothing,  propably empty or multiline continuation.");
         }
         return results;
     }
 
-    private void storePropertyName(@Nonnull final String name, @Nonnull Map<String,Integer> properties) {
+    private void storePropertyName(@Nonnull final String name, @Nonnull final Map<String,Integer> properties) {
         log.debug("            Reading property " + name + ".");
         if (!properties.containsKey(name)) {
             log.debug("            Not defined before.");
