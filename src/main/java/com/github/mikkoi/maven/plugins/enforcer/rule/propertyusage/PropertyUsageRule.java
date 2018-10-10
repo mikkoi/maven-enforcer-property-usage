@@ -183,9 +183,12 @@ public final class PropertyUsageRule implements EnforcerRule {
             log.debug("PropertyUsageRule:execute() - Run:");
             // Get property definitions (i.e. property names):
             // Get all the fileSpecs to read for the properties definitions.
+            log.debug("definitions:");
+            definitions.stream().forEach(a -> log.debug(a));
+            log.debug(":END");
             final Collection<String> propertyFilenames = FileSpecs.getAbsoluteFilenames(definitions, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
-            // Get the property definitions and how many times they are defined.
+                    // Get the property definitions and how many times they are defined.
             Map<String, Set<PropertyDefinition>> definedProperties = getPropertiesDefined(propertiesEnc, propertyFilenames);
             definedProperties.forEach((prop, defs) -> {
                 log.debug("Property '" + prop + "' defined " + defs.size() + " times.");
