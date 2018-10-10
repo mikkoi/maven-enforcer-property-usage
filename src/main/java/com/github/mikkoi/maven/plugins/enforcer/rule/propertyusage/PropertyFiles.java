@@ -1,8 +1,5 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-import org.apache.maven.plugin.logging.Log;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,13 +7,20 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+
+import org.apache.maven.plugin.logging.Log;
 
 /**
  * Handle issues with .properties files.
@@ -28,8 +32,8 @@ class PropertyFiles {
     private final Charset charset;
 
     private final Pattern commentLineP = Pattern.compile("^[\\s]{0,}[\\#\\!]{1}.{0,}$");
-    private final Pattern simplePropertyLineP = Pattern.compile("^[\\s]{0,}([^=:]{1,})[=:]{1}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
-    private final Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}.{0,}$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
+    private final Pattern simplePropertyLineP = Pattern.compile("^[\\s]{0,}([^=:]{1,})[=:]{1}(.{0,})$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
+    private final Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}(.{0,})$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
     private final Pattern multiLineP = Pattern.compile("\\\\{1}[\\s]{0,}$");
 
     PropertyFiles(@Nonnull final Log logger, @Nonnull final Charset cset) {
@@ -98,10 +102,13 @@ class PropertyFiles {
     Map<String, Integer> readPropertiesFromFileWithCount(@Nonnull final String filename)
             throws IOException {
         final Map<String, Integer> results = new HashMap<>();
+        final Map<String, Set<PropertyDefinition>> propertyDefinitions = new HashMap<>();
         List<String> rows = Files.readAllLines(Paths.get(filename), charset);
         boolean readingMultiLineDefinition = false;
+        int linenumber = 0;
         for ( String row : rows) {
-            log.debug("    Reading property row '" + row + "'.");
+        	linenumber++;
+            log.debug("    Reading property row '" + row + "' (" + linenumber + ").");
             Matcher commentLineM = commentLineP.matcher(row);
             if (commentLineM.find()) {
                 log.debug("        This is comment line.");
@@ -126,15 +133,17 @@ class PropertyFiles {
             Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
             if (simplePropertyLineM.find()) {
                 log.debug("        This is simple property line.");
-                final String name = simplePropertyLineM.group(1).trim();
-                storePropertyName(name, results);
+                final String key = simplePropertyLineM.group(1).trim();
+                final String value = simplePropertyLineM.group(2).trim();
+                storePropertyName(key, value, filename, linenumber, results, propertyDefinitions);
                 continue;
             }
             Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
             if(notSimplePropertyLineM.find()) {
                 log.debug("        This is not simple property line.");
-                final String name = notSimplePropertyLineM.group(1).trim();
-                storePropertyName(name, results);
+                final String key = notSimplePropertyLineM.group(1).trim();
+                final String value = simplePropertyLineM.group(2).trim();
+                storePropertyName(key, value, filename, linenumber, results, propertyDefinitions);
                 continue;
             }
             log.debug("        This row matched nothing,  propably empty or multiline continuation.");
@@ -142,14 +151,18 @@ class PropertyFiles {
         return results;
     }
 
-    private void storePropertyName(@Nonnull final String name, @Nonnull final Map<String,Integer> properties) {
-        log.debug("            Reading property " + name + ".");
-        if (!properties.containsKey(name)) {
+    private void storePropertyName(@Nonnull final String key, @Nonnull final String value, @Nonnull final String filename, final int linenumber, @Nonnull final Map<String,Integer> properties, @Nonnull final Map<String,Set<PropertyDefinition>> propertyDefinitions) {
+        log.debug("            Reading property " + key + ".");
+        if (!properties.containsKey(key)) {
             log.debug("            Not defined before.");
-            properties.put(name, 1);
+            properties.put(key, 1);
+            final Set<PropertyDefinition> p = new HashSet<>();
+            p.add(new PropertyDefinition(key, value, filename, linenumber));
+            propertyDefinitions.put(key, p);
         } else {
             log.debug("            Defined before. Update counter.");
-            properties.replace(name, properties.get(name) + 1);
+            properties.replace(key, properties.get(key) + 1);
+            propertyDefinitions.get(key).add(new PropertyDefinition(key, value, filename, linenumber));
         }
     }
 }

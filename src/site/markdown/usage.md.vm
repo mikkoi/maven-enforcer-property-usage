@@ -28,6 +28,7 @@ Add the following to your project's `pom.xml` file:
                             <definitionsOnlyOnce>true</definitionsOnlyOnce>
                             <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
                             <usedPropertiesAreDefined>false</usedPropertiesAreDefined>
+                            <reportDuplicateDefinitions></reportDuplicateDefinitions>
                         </useAllProperties>
                     </rules>
                     <!-- Fail build if wrong encoding encountered. -->

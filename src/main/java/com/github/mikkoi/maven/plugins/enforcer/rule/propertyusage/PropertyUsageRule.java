@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Verifies for usage of properties mentioned in .properties files.
@@ -52,6 +53,12 @@ public final class PropertyUsageRule implements EnforcerRule {
      */
     @Nonnull
     private final Set<UsageFiles.UsageLocation> propertiesNotDefined = new HashSet<>();
+
+    /**
+     * All properties defined.
+     */
+    @Nonnull
+    private final Map<String, Set<PropertyDefinition>> propertiesDefined = new ConcurrentHashMap<>();
 
     /**
      * Logger given by Maven Enforcer.
@@ -88,6 +95,11 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Activate usedPropertiesAreDefined
      */
     private boolean usedPropertiesAreDefined = false;
+
+    /**
+     * Activate reportDuplicateDefinitions
+     */
+    private boolean reportDuplicateDefinitions = false;
 
     /**
      * Replace this string with property name in template(s).
@@ -261,7 +273,16 @@ public final class PropertyUsageRule implements EnforcerRule {
                     log.error("Property '" + loc.getProperty() + "' used without defining it ("
                             + loc.getFilename() + ":" + loc.getRow() + ")"));
         }
-
+        // reportDuplicateDefinitions
+        if (reportDuplicateDefinitions) {
+        	propertiesDefined.entrySet().stream().filter(entry -> entry.getValue().size() > 1).forEach(
+        			entry -> entry.getValue().forEach(
+        					propDef -> log.info("Defined '" + propDef.getKey() + "' with value '" + propDef.getValue()
+        					+ "' in " + propDef.getFilename() + ":" + propDef.getLinenumber())
+        					)
+        			);
+        }
+        
         // Fail rule if errors in wanted categories.
         if (definedPropertiesAreUsed && !propertiesNotUsed.isEmpty()
                 || usedPropertiesAreDefined && !propertiesNotDefined.isEmpty()
@@ -340,6 +361,11 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     public Map<String, Integer> getPropertiesDefinedMoreThanOnce() {
         return propertiesDefinedMoreThanOnce;
+    }
+
+    @Nonnull
+    public Map<String, Set<PropertyDefinition>> getPropertiesDefined() {
+        return propertiesDefined;
     }
 
     public boolean isDefinedPropertiesAreUsed() {
