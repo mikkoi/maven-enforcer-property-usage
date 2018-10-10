@@ -7,6 +7,8 @@ import java.util.Collections;
 public class Usages {
 
     private Usages() {
+		// This class cannot be instantiated.
+		throw new AssertionError();
     }
 
     /**

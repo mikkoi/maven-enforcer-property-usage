@@ -7,6 +7,8 @@ import java.util.Collections;
 public class Definitions {
 
     private Definitions() {
+		// This class cannot be instantiated.
+		throw new AssertionError();
     }
 
     /**

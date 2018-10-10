@@ -17,6 +17,8 @@ public class Templates {
     public static final String DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME = "REPLACE_THIS";
 
     private Templates() {
+		// This class cannot be instantiated.
+		throw new AssertionError();
     }
 
     /**
