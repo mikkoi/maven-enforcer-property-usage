@@ -28,6 +28,7 @@ Add the following to your project's `pom.xml` file:
                             <definitionsOnlyOnce>true</definitionsOnlyOnce>
                             <definedPropertiesAreUsed>true</definedPropertiesAreUsed>
                             <usedPropertiesAreDefined>false</usedPropertiesAreDefined>
+                            <reportDuplicateDefinitions></reportDuplicateDefinitions>
                         </useAllProperties>
                     </rules>
                     <!-- Fail build if wrong encoding encountered. -->
@@ -53,3 +54,6 @@ The rule has three different functions. These are accessed via the elements
 Here we want the simpliest configuration so we only activate
 `<definitionsOnlyOnce>` and `<definedPropertiesAreUsed>`. Default for all
 is *true*.
+
+Besides the three functions, user can ask for more verbose reporting
+with option `<reportDuplicateDefinitions>`.

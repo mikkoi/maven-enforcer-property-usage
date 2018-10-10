@@ -54,6 +54,12 @@ public final class PropertyUsageRule implements EnforcerRule {
     private final Set<UsageFiles.UsageLocation> propertiesNotDefined = new HashSet<>();
 
     /**
+     * All properties defined.
+     */
+    @Nonnull
+    private final Map<String, Set<PropertyDefinition>> propertiesDefined = new ConcurrentHashMap<>();
+
+    /**
      * Logger given by Maven Enforcer.
      */
     Log log;
@@ -88,6 +94,11 @@ public final class PropertyUsageRule implements EnforcerRule {
      * Activate usedPropertiesAreDefined
      */
     private boolean usedPropertiesAreDefined = false;
+
+    /**
+     * Activate reportDuplicateDefinitions
+     */
+    private boolean reportDuplicateDefinitions = false;
 
     /**
      * Replace this string with property name in template(s).
@@ -144,12 +155,12 @@ public final class PropertyUsageRule implements EnforcerRule {
         Charset propertiesEnc = DEFAULT_CHAR_SET;
         Charset sourceEnc = DEFAULT_CHAR_SET;
         try {
-            if(StringUtils.isNotBlank(propertiesEncoding)) {
+            if (StringUtils.isNotBlank(propertiesEncoding)) {
                 propertiesEnc = Charset.forName(propertiesEncoding);
             } else {
                 propertiesEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
             }
-            if(StringUtils.isNotBlank(sourceEncoding)) {
+            if (StringUtils.isNotBlank(sourceEncoding)) {
                 sourceEnc = Charset.forName(sourceEncoding);
             } else {
                 sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
@@ -172,33 +183,30 @@ public final class PropertyUsageRule implements EnforcerRule {
             log.debug("PropertyUsageRule:execute() - Run:");
             // Get property definitions (i.e. property names):
             // Get all the fileSpecs to read for the properties definitions.
+            log.debug("definitions:");
+            definitions.stream().forEach(a -> log.debug(a));
+            log.debug(":END");
             final Collection<String> propertyFilenames = FileSpecs.getAbsoluteFilenames(definitions, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
-            // Get the property definitions and how many times they are defined.
-            Map<String, Integer> definedProperties;
-            if (definitionsOnlyOnce) {
-                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithCount(propertyFilenames);
-                definedProperties.forEach((prop, nrOf) -> {
-                    log.debug("Property '" + prop + "' defined " + nrOf + " times.");
-                    if (nrOf > 1) {
-                        propertiesDefinedMoreThanOnce.put(prop, nrOf);
-                    }
-                });
-            } else {
-                definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithoutCount(propertyFilenames);
-            }
+                    // Get the property definitions and how many times they are defined.
+            Map<String, Set<PropertyDefinition>> definedProperties = getPropertiesDefined(propertiesEnc, propertyFilenames);
+            definedProperties.forEach((prop, defs) -> {
+                log.debug("Property '" + prop + "' defined " + defs.size() + " times.");
+                if (defs.size() > 1) {
+                    propertiesDefinedMoreThanOnce.put(prop, defs.size());
+                }
+            });
 
             // Get all the fileSpecs to check for property usage.
             // Normally **/*.java, maybe **/*.jsp, etc.
             final Collection<String> usageFilenames = FileSpecs.getAbsoluteFilenames(usages, basedir, log)
                     .stream().sorted().collect(Collectors.toSet());
-
             // Iterate through fileSpecs and collect property usage.
             // Iterate
             final UsageFiles usageFiles = new UsageFiles(log);
             if (definedPropertiesAreUsed) {
                 log.debug("definedPropertiesAreUsed");
-                final Map<String,String> readyTemplates = new ConcurrentHashMap<>();
+                final Map<String, String> readyTemplates = new ConcurrentHashMap<>();
                 templates.forEach(tpl -> definedProperties.forEach(
                         (propertyDefinition, nrPropertyDefinitions) ->
                                 readyTemplates.put(
@@ -221,7 +229,7 @@ public final class PropertyUsageRule implements EnforcerRule {
                 log.debug("usedPropertiesAreDefined");
                 final Set<String> readyTemplates = new HashSet<>();
                 templates.forEach(tpl -> readyTemplates.add(
-                                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyNameRegexp)
+                        tpl.replaceAll(replaceInTemplateWithPropertyName, propertyNameRegexp)
                         )
                 );
                 log.debug("readyTemplates:" + readyTemplates);
@@ -261,17 +269,49 @@ public final class PropertyUsageRule implements EnforcerRule {
                     log.error("Property '" + loc.getProperty() + "' used without defining it ("
                             + loc.getFilename() + ":" + loc.getRow() + ")"));
         }
+        // reportDuplicateDefinitions
+        if (reportDuplicateDefinitions) {
+            propertiesDefined.entrySet().stream().filter(entry -> entry.getValue().size() > 1).forEach(
+                    entry -> entry.getValue().forEach(
+                            propDef -> log.info("Defined '" + propDef.getKey() + "' with value '" + propDef.getValue()
+                                    + "' in " + propDef.getFilename() + ":" + propDef.getLinenumber())
+                    )
+            );
+        }
 
         // Fail rule if errors in wanted categories.
         if (definedPropertiesAreUsed && !propertiesNotUsed.isEmpty()
                 || usedPropertiesAreDefined && !propertiesNotDefined.isEmpty()
                 || definitionsOnlyOnce && !propertiesDefinedMoreThanOnce.isEmpty()
-                ) {
+        ) {
             throw new EnforcerRuleException(
                     "Errors in property definitions or usage!"
             );
         }
     }
+
+    private Map<String, Integer> getPropertiesDefinedMoreThanOnce(final Charset propertiesEnc, final Collection<String> propertyFilenames) throws IOException {
+        Map<String, Integer> definedProperties;
+        if (definitionsOnlyOnce) {
+            definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithCount(propertyFilenames);
+            definedProperties.forEach((prop, nrOf) -> {
+                log.debug("Property '" + prop + "' defined " + nrOf + " times.");
+                if (nrOf > 1) {
+                    propertiesDefinedMoreThanOnce.put(prop, nrOf);
+                }
+            });
+        } else {
+            definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithoutCount(propertyFilenames);
+        }
+        return definedProperties;
+    }
+
+    private Map<String, Set<PropertyDefinition>> getPropertiesDefined(final Charset propertiesEnc, final Collection<String> propertyFilenames) throws IOException {
+        Map<String, Set<PropertyDefinition>> definedProperties;
+        definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesGetDefinitions(propertyFilenames);
+        return definedProperties;
+    }
+
 
     /**
      * If your rule is cacheable, you must return a unique id
@@ -340,6 +380,11 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     public Map<String, Integer> getPropertiesDefinedMoreThanOnce() {
         return propertiesDefinedMoreThanOnce;
+    }
+
+    @Nonnull
+    public Map<String, Set<PropertyDefinition>> getPropertiesDefined() {
+        return propertiesDefined;
     }
 
     public boolean isDefinedPropertiesAreUsed() {
