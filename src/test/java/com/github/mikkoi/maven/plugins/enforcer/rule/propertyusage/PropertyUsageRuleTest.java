@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test class PropertyUsageRule.
  */
-public final class TestPropertyUsageRule {
+public final class PropertyUsageRuleTest {
 
     private void testProps(
             // Configuration (null value => use defaults)
