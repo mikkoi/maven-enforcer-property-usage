@@ -54,3 +54,6 @@ The rule has three different functions. These are accessed via the elements
 Here we want the simpliest configuration so we only activate
 `<definitionsOnlyOnce>` and `<definedPropertiesAreUsed>`. Default for all
 is *true*.
+
+Besides the three functions, user can ask for more verbose reporting
+with option `<reportDuplicateDefinitions>`.

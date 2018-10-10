@@ -27,6 +27,13 @@ in the files in `<usage>` element are also defined in properties files.
 
 Default value is false.
 
+* `<reportDuplicateDefinitions>`, boolean
+
+If this value is set, rule writes out all the properties
+which are defined more than once.
+
+Default value is false.
+
 
 Environment
 ---
