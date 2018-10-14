@@ -46,8 +46,8 @@ public class FileSpecsTest {
     public void getFilenamesFromFileSpecs_noFiles() throws Exception {
         SystemStreamLog slog = new SystemStreamLog();
         Collection<String> files = Arrays.asList(
-                "src/test/resources/no-exist-dir/*.properties",
-                "src/test/resources/no-way.properties"
+                absoluteCwdAndFile("src/test/resources/no-exist-dir/*.properties"),
+                absoluteCwdAndFile("src/test/resources/no-way.properties")
         );
         Collection<String> expected = Collections.emptySet();
         expected = expected.stream().sorted().collect(Collectors.toSet());
