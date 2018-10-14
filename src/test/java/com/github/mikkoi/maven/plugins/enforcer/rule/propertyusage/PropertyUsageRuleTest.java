@@ -84,6 +84,7 @@ public final class PropertyUsageRuleTest {
         final Set<String> resultPropertiesNodDefined = new HashSet<>();
         rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNodDefined.add(val.getProperty()));
         assertTrue("Properties not defined as expected.", rule.isUsedPropertiesAreDefined() || resultPropertiesNodDefined.equals(propertiesNotDefined));
+        System.err.println(rule.getPropertiesDefinedMoreThanOnce());
         assertTrue("Properties defined more than once as expected.", rule.getPropertiesDefinedMoreThanOnce().keySet().equals(propertiesDefinedMoreThanOnce));
     }
 
@@ -309,6 +310,9 @@ public final class PropertyUsageRuleTest {
     public void testPropertyUsageRuleDefinedFail_Wildcard1() {
         final Collection<String> templates = new HashSet<>();
         templates.add("properties\\.getProperty\\(\"REPLACE_ME_HERE\"\\)");
+        final Collection<String> propertiesDefinedMoreThanOnce = new HashSet<>();
+        propertiesDefinedMoreThanOnce.add("first.property.value");
+        propertiesDefinedMoreThanOnce.add("third.property.value");
         Collection<String> propertiesNotUsed = new HashSet<>();
         propertiesNotUsed.add("my-second.prop.val");
         propertiesNotUsed.add("my-first.property.value");
@@ -322,7 +326,7 @@ public final class PropertyUsageRuleTest {
                 templates,
                 Collections.singleton("src/test/java/**/AppEmpty.java"),
                 true, // No properties found, so all "found" properties are defined!
-                Collections.emptySet(),
+                propertiesDefinedMoreThanOnce,
                 propertiesNotUsed,
                 Collections.emptySet()
         );
@@ -343,6 +347,9 @@ public final class PropertyUsageRuleTest {
         definitions.add("src/test/resources/app1.properties");
         definitions.add(tempFile.getAbsolutePath());
         definitions.add("src/test/resources/properties-dir/sub-app-props2.properties");
+        final Collection<String> propertiesDefinedMoreThanOnce = new HashSet<>();
+        propertiesDefinedMoreThanOnce.add("first.property.value");
+        propertiesDefinedMoreThanOnce.add("third.property.value");
         Collection<String> propertiesNotUsed = new HashSet<>();
         propertiesNotUsed.add("subapp.other.prop.val");
         propertiesNotUsed.add("third.property.value");
@@ -363,7 +370,7 @@ public final class PropertyUsageRuleTest {
                 templates,
                 Collections.singleton("src/test/java/**/App*.java"),
                 false,
-                Collections.emptySet(),
+                propertiesDefinedMoreThanOnce,
                 propertiesNotUsed,
                 Collections.emptySet()
         );
