@@ -26,79 +26,87 @@
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_javadoccomment"> */</em>
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.html">FileSpecs</a> {
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>      <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.html">FileSpecs</a>() {
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>      }
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> String absoluteCwdAndFile(@Nonnull <strong class="jxr_keyword">final</strong> String filename) {
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>          <strong class="jxr_keyword">return</strong> Paths.get(System.getProperty(<span class="jxr_string">"user.dir"</span>), filename).toAbsolutePath().normalize().toString();
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>      }
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>      <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment">     * Process collection of file names.</em>
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment">     * If file name is a file, get its absolute path.</em>
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment">     * If not, assume it is either a directory or a wildcard name, and</em>
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment">     * scan it with DirectoryScanner.</em>
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment">     * @param files A Collection of Strings</em>
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment">     * @return A Collection of Strings</em>
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>      @Nonnull
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;String&gt; getAbsoluteFilenames(
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>              @Nonnull <strong class="jxr_keyword">final</strong> Collection&lt;String&gt; files,
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>              @Nonnull <strong class="jxr_keyword">final</strong> Path basedir,
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>              @Nonnull <strong class="jxr_keyword">final</strong> Log log
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>              ) {
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>          Collection&lt;String&gt; allFilenames = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>          <strong class="jxr_keyword">if</strong>(!files.isEmpty()) {
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>              <em class="jxr_comment">// We have to process away files with an absolute path because</em>
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>              <em class="jxr_comment">// DirectoryScanner can't handle them (as they may not be in basedir)</em>
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>              <em class="jxr_comment">// So we take away all files that exist.</em>
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>              <strong class="jxr_keyword">for</strong> (String fileSpec : files) {
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>                  File file = <strong class="jxr_keyword">new</strong> File(fileSpec);
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>                  <strong class="jxr_keyword">if</strong> (StringUtils.isBlank(fileSpec)) {
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>                      log.error(logFileIterationMsg(fileSpec, <span class="jxr_string">"is blank. Error in configuration"</span>) + <span class="jxr_string">"!"</span>);
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>                  } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (file.exists() &amp;&amp; file.isFile()) {
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"is a file"</span>) + <span class="jxr_string">"."</span>);
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>                      allFilenames.add(file.getAbsolutePath()); <em class="jxr_comment">// If item is already in Set, discarded automatically.</em>
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>                  } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (file.exists() &amp;&amp; file.isDirectory()) {
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"is a directory"</span>) + <span class="jxr_string">"."</span>);
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>                      DirectoryScanner ds = initializeDS(Paths.get(fileSpec));
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>                      ds.scan();
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>                      allFilenames.addAll(Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; <strong class="jxr_keyword">new</strong> File(includedFile).getAbsolutePath()).collect(Collectors.toSet()));
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>                  } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (file.exists()) {
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>                      log.error(logFileIterationMsg(fileSpec, <span class="jxr_string">"is not a file or directory. Do not know what to do"</span>) + <span class="jxr_string">"!"</span>);
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>                  } <strong class="jxr_keyword">else</strong> {
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"does not exist. Assume wildcards"</span>) + <span class="jxr_string">"."</span>);
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>                      DirectoryScanner ds = initializeDS(basedir);
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>                      ds.setIncludes(<strong class="jxr_keyword">new</strong> String[]{fileSpec});
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>                      ds.scan();
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>                      Collection&lt;String&gt; foundFiles = Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; Paths.get(basedir.toString(), includedFile).toString()).collect(Collectors.toSet());
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>                      log.debug(<span class="jxr_string">"    Found files:"</span> + foundFiles.toString());
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>                      allFilenames.addAll(foundFiles);
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>                  }
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>              }
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>          }
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>          <strong class="jxr_keyword">return</strong> allFilenames;
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      }
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>  
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> DirectoryScanner initializeDS(@Nonnull <strong class="jxr_keyword">final</strong> Path path) {
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>          DirectoryScanner ds = <strong class="jxr_keyword">new</strong> DirectoryScanner();
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>          ds.setCaseSensitive(<strong class="jxr_keyword">true</strong>);
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>          ds.setFollowSymlinks(<strong class="jxr_keyword">true</strong>);
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>          ds.addDefaultExcludes();
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>          ds.setBasedir(path.toAbsolutePath().toString());
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>          <strong class="jxr_keyword">return</strong> ds;
-<a class="jxr_linenumber" name="L83" href="#L83">83</a>      }
-<a class="jxr_linenumber" name="L84" href="#L84">84</a>  
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>      @Nonnull
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> String logFileIterationMsg(@Nonnull <strong class="jxr_keyword">final</strong> String filename, @Nonnull <strong class="jxr_keyword">final</strong> String comment) {
-<a class="jxr_linenumber" name="L87" href="#L87">87</a>          <strong class="jxr_keyword">return</strong> <span class="jxr_string">"File spec '"</span> + filename + <span class="jxr_string">"' "</span> + comment;
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>      }
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>  
-<a class="jxr_linenumber" name="L90" href="#L90">90</a>  
-<a class="jxr_linenumber" name="L91" href="#L91">91</a>  }
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  	<strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../com/github/mikkoi/maven/plugins/enforcer/rule/propertyusage/configuration/FileSpecs.html">FileSpecs</a>() {
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  		<em class="jxr_comment">// This class cannot be instantiated.</em>
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  		<strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> AssertionError();
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  	}
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> String absoluteCwdAndFile(@Nonnull <strong class="jxr_keyword">final</strong> String filename) {
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>          <strong class="jxr_keyword">return</strong> Paths.get(System.getProperty(<span class="jxr_string">"user.dir"</span>), filename).toAbsolutePath().normalize().toString();
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>      }
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>      <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment">     * Process collection of file names.</em>
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment">     * If file name is a file, get its absolute path.</em>
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment">     * If not, assume it is either a directory or a wildcard name, and</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment">     * scan it with DirectoryScanner.</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment">     * @param files A Collection of Strings</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <em class="jxr_javadoccomment">     * @return A Collection of Strings</em>
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>      @Nonnull
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;String&gt; getAbsoluteFilenames(
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>              @Nonnull <strong class="jxr_keyword">final</strong> Collection&lt;String&gt; files,
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>              @Nonnull <strong class="jxr_keyword">final</strong> Path basedir,
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>              @Nonnull <strong class="jxr_keyword">final</strong> Log log
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>              ) {
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>          Collection&lt;String&gt; allFilenames = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>          <strong class="jxr_keyword">if</strong>(!files.isEmpty()) {
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>              <em class="jxr_comment">// We have to process away files with an absolute path because</em>
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>              <em class="jxr_comment">// DirectoryScanner can't handle them (as they may not be in basedir)</em>
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>              <em class="jxr_comment">// So we take away all files that exist.</em>
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>              <strong class="jxr_keyword">for</strong> (String fileSpec : files) {
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>              	<strong class="jxr_keyword">if</strong> (StringUtils.isBlank(fileSpec)) {
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>                      log.error(logFileIterationMsg(fileSpec, <span class="jxr_string">"is blank. Error in configuration"</span>) + <span class="jxr_string">"!"</span>);
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>                      <strong class="jxr_keyword">continue</strong>;
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>                  }
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>              	File file = <strong class="jxr_keyword">new</strong> File(fileSpec);
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>                  <strong class="jxr_keyword">if</strong> (file.exists() &amp;&amp; file.isFile()) {
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"is a file"</span>) + <span class="jxr_string">"."</span>);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>                      allFilenames.add(file.getAbsolutePath()); <em class="jxr_comment">// If item is already in Set, discarded automatically.</em>
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>                  } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (file.exists() &amp;&amp; file.isDirectory()) {
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"is a directory"</span>) + <span class="jxr_string">"."</span>);
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>                      DirectoryScanner ds = initializeDS(Paths.get(fileSpec));
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>                      ds.scan();
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>                      allFilenames.addAll(Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; <strong class="jxr_keyword">new</strong> File(includedFile).getAbsolutePath()).collect(Collectors.toSet()));
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>                  } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (file.exists()) {
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>                      log.error(logFileIterationMsg(fileSpec, <span class="jxr_string">"is not a file or directory. Do not know what to do"</span>) + <span class="jxr_string">"!"</span>);
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>                  } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>                      log.debug(logFileIterationMsg(fileSpec, <span class="jxr_string">"does not exist. Assume wildcards"</span>) + <span class="jxr_string">"."</span>);
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>                      DirectoryScanner ds = initializeDS(basedir);
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>                      ds.setIncludes(<strong class="jxr_keyword">new</strong> String[]{fileSpec});
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>                      ds.scan();
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>                      Collection&lt;String&gt; foundFiles = Arrays.stream(ds.getIncludedFiles()).map(includedFile -&gt; Paths.get(basedir.toString(), includedFile).toString()).collect(Collectors.toSet());
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>                      log.debug(<span class="jxr_string">"    Found files:["</span>);
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>                      <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> String foundFile : foundFiles) {
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>                          log.debug(<span class="jxr_string">"        "</span> + foundFile);
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>                      }
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>                      log.debug(<span class="jxr_string">"    ]"</span>);
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>                      allFilenames.addAll(foundFiles);
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>                  }
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>              }
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>          }
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>          <strong class="jxr_keyword">return</strong> allFilenames;
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      }
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>  
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> DirectoryScanner initializeDS(@Nonnull <strong class="jxr_keyword">final</strong> Path path) {
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>          DirectoryScanner ds = <strong class="jxr_keyword">new</strong> DirectoryScanner();
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>          ds.setCaseSensitive(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>          ds.setFollowSymlinks(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>          ds.addDefaultExcludes();
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>          ds.setBasedir(path.toAbsolutePath().toString());
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>          <strong class="jxr_keyword">return</strong> ds;
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>      }
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>  
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>      @Nonnull
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> String logFileIterationMsg(@Nonnull <strong class="jxr_keyword">final</strong> String filename, @Nonnull <strong class="jxr_keyword">final</strong> String comment) {
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>          <strong class="jxr_keyword">return</strong> <span class="jxr_string">"File spec '"</span> + filename + <span class="jxr_string">"' "</span> + comment;
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>      }
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>  
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>  
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2016&#x2013;2017 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Private</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2016&#x2013;2018 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Private</a>. All rights reserved.</div>
 </body>
 </html>
