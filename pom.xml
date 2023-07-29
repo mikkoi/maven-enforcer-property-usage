@@ -89,27 +89,23 @@
         <!-- Conditionals for unit and integration tests -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
-        <!--<surefireArgLine></surefireArgLine> &lt;!&ndash; Dummy, otherwise surefile plugin conf causes IntelliJ to complain &ndash;&gt;-->
 
         <!-- SonarQube intergration -->
 
         <sonar.projectKey>${project.groupId}:${project.artifactId}</sonar.projectKey>
         <sonar.language>java</sonar.language>
-        <!--<sonar.projectDescription>${project.description}</sonar.projectDescription>-->
+        <sonar.projectDescription>${project.description}</sonar.projectDescription>
         <sonar.links.homepage>http://mikkoi.github.io/maven-enforcer-property-usage/</sonar.links.homepage>
-        <!--<sonar.links.ci></sonar.links.ci>-->
         <sonar.links.issue>${project.issueManagement.url}</sonar.links.issue>
+        <sonar.link.scm>${project.scm.url}</sonar.link.scm>
+        <sonar.sources>src/main/java</sonar.sources>
         <sonar.tests>src/test/java</sonar.tests>
+        <sonar.sourceEncoding>${project.build.sourceEncoding}</sonar.sourceEncoding>
         <sonar.log.level>DEBUG</sonar.log.level>
         <sonar.verbose>true</sonar.verbose>
         <sonar.report.export.path>site/sonar</sonar.report.export.path>
         <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
-        <!--<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>-->
-        <sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
-        <!--<sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>-->
-        <!--<sonar.jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</sonar.jacoco.itReportPath>-->
-        <sonar.cpd.cross_project>true</sonar.cpd.cross_project>
         <sonar.java.spotbugs.reportPaths>${project.build.directory}/spotbugs.xml</sonar.java.spotbugs.reportPaths>
         <sonar.java.pmd.reportPaths>${project.build.directory}/pmd.xml</sonar.java.pmd.reportPaths>
         <sonar.java.checkstyle.reportPaths>${project.build.directory}/checkstyle-result.xml</sonar.java.checkstyle.reportPaths>
