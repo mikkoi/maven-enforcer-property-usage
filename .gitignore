@@ -23,3 +23,5 @@ org.eclipse.core.resources.prefs
 .idea/
 .iml
 
+# Maven
+.mvn
