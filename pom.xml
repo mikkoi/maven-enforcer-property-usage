@@ -73,12 +73,12 @@
     <properties>
         <generateProjectInfo>true</generateProjectInfo>
         <generateReports>false</generateReports>
+
         <enforcer.api.version>3.5.0</enforcer.api.version>
-        <enforcer.api.test-jar.version>3.1.0</enforcer.api.test-jar.version>
         <maven.version>3.9.9</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.debug>true</maven.compiler.debug>
+
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -142,16 +142,26 @@
             <dependency>
                 <groupId>org.apache.maven.enforcer</groupId>
                 <artifactId>enforcer-rules</artifactId>
-                <version>${enforcer.api.test-jar.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
+                <version>${enforcer.api.version}</version>
+                <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.enforcer</groupId>
                 <artifactId>enforcer-rules</artifactId>
                 <version>${enforcer.api.version}</version>
-                <type>jar</type>
-                <scope>compile</scope>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
@@ -181,6 +191,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>4.11.0</version>
             </dependency>
 
             <!-- QA -->
@@ -223,12 +238,23 @@
         <dependency>
             <groupId>org.apache.maven.enforcer</groupId>
             <artifactId>enforcer-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.enforcer</groupId>
             <artifactId>enforcer-rules</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.enforcer</groupId>
@@ -249,6 +275,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -491,6 +522,11 @@
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>5.0.0.4389</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.eclipse.sisu</groupId>
+                    <artifactId>sisu-maven-plugin</artifactId>
+                    <version>0.9.0.M1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -525,6 +561,19 @@
                         <arg>-XDcompilePolicy=simple</arg>
                         <arg>--should-stop=ifError=FLOW</arg>
                         <arg>-Xplugin:ErrorProne</arg>
+
+                        <!-- For issues with error-prone, see: https://errorprone.info/docs/installation#maven -->
+                        <!-- Add the following to the .mvn/jvm.config file: -->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED-->
+                        <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED-->
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
@@ -640,6 +689,18 @@
                         <exclude>**/IT*.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <!-- generate index of project components -->
+                <groupId>org.eclipse.sisu</groupId>
+                <artifactId>sisu-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>main-index</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
