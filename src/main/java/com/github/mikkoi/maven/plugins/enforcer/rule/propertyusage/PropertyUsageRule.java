@@ -7,9 +7,7 @@ import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
 //import com.google.common.base.Charsets;
 import org.apache.maven.enforcer.rule.api.*;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
@@ -25,9 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.rtinfo.RuntimeInformation;
 
 /**
  * Custom Enforcer Rule - Verifies the usage of properties mentioned in .properties files.
@@ -289,7 +285,7 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
             propertiesDefined.entrySet().stream().filter(entry -> entry.getValue().size() > 1).forEach(
                     entry -> entry.getValue().forEach(
                             propDef -> log.info("Defined '" + propDef.getKey() + "' with value '" + propDef.getValue()
-                                    + "' in " + propDef.getFilename() + ":" + propDef.getLinenumber())
+                                    + "' in " + propDef.getFilename() + ":" + propDef.getLineNumber())
                     )
             );
         }

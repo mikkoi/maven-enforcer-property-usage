@@ -10,17 +10,17 @@ public class PropertyDefinition {
     private final @NonNull String key;
     private final @NonNull String value;
     private final @NonNull String filename;
-    private final int linenumber;
+    private final int lineNumber;
 
     public PropertyDefinition(final @NonNull String key, final @NonNull String value, final @NonNull String filename,
-                              final int linenumber) {
+                              final int lineNumber) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
         Objects.requireNonNull(filename);
         this.key = key;
         this.value = value;
         this.filename = filename;
-        this.linenumber = linenumber;
+        this.lineNumber = lineNumber;
     }
 
     public @NonNull String getKey() {
@@ -35,8 +35,8 @@ public class PropertyDefinition {
         return filename;
     }
 
-    public int getLinenumber() {
-        return linenumber;
+    public int getLineNumber() {
+        return lineNumber;
     }
 
 }
