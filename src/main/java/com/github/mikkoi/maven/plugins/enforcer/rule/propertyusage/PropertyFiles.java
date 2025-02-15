@@ -46,7 +46,7 @@ class PropertyFiles {
             File file = new File(filename);
             Properties properties = new Properties();
             log.debug("PropertyFiles:readPropertiesFromFilesWithoutCount() Reading file " + filename + ".");
-            try (InputStream inputStream = new FileInputStream(file)) {
+            try (InputStream inputStream = java.nio.file.Files.newInputStream(file.toPath())) {
                 properties.load(inputStream);
                 for (String name : properties.stringPropertyNames()) {
                     log.debug("    Reading property " + name + ".");

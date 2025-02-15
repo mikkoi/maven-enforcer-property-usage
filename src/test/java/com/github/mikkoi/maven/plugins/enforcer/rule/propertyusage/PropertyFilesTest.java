@@ -5,8 +5,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -126,7 +126,7 @@ public class PropertyFilesTest {
         assertEquals("Read properties are as expected.", expected, properties);
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = NoSuchFileException.class)
     public void readPropertiesFromFiles_ExceptionBecauseFileNotExists() throws Exception {
         Collection<String> filenames = Collections.singletonList(
                 "src/test/resources/not-exists.properties"
