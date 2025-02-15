@@ -4,7 +4,7 @@ import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +23,7 @@ public class FileSpecs {
 		throw new AssertionError();
 	}
 
-    public static String absoluteCwdAndFile(@Nonnull final String filename) {
+    public static String absoluteCwdAndFile(final @NonNull String filename) {
         return Paths.get(System.getProperty("user.dir"), filename).toAbsolutePath().normalize().toString();
     }
 
@@ -36,11 +36,10 @@ public class FileSpecs {
      * @param files A Collection of Strings
      * @return A Collection of Strings
      */
-    @Nonnull
-    public static Collection<String> getAbsoluteFilenames(
-            @Nonnull final Collection<String> files,
-            @Nonnull final Path basedir,
-            @Nonnull final EnforcerLogger log
+    public static @NonNull Collection<String> getAbsoluteFilenames(
+            final @NonNull Collection<String> files,
+            final @NonNull Path basedir,
+            final @NonNull EnforcerLogger log
             ) {
         Collection<String> allFilenames = new HashSet<>();
         if(!files.isEmpty()) {
@@ -81,7 +80,7 @@ public class FileSpecs {
         return allFilenames;
     }
 
-    private static DirectoryScanner initializeDS(@Nonnull final Path path) {
+    private static DirectoryScanner initializeDS(final @NonNull Path path) {
         DirectoryScanner ds = new DirectoryScanner();
         ds.setCaseSensitive(true);
         ds.setFollowSymlinks(true);
@@ -90,8 +89,7 @@ public class FileSpecs {
         return ds;
     }
 
-    @Nonnull
-    private static String logFileIterationMsg(@Nonnull final String filename, @Nonnull final String comment) {
+    private static @NonNull String logFileIterationMsg(final @NonNull String filename, final @NonNull String comment) {
         return "File spec '" + filename + "' " + comment;
     }
 

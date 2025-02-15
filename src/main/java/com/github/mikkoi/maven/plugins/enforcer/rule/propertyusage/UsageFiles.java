@@ -1,19 +1,13 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
-import org.apache.maven.plugin.logging.Log;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,11 +30,10 @@ class UsageFiles {
      * @param templatesAndProperties  Collection of templates (regexp) to use for matching, and their equivalent property.
      * @return Map of usages not found and their location (file,row), though location does not matter here.
      */
-    @Nonnull
-    Set<String> readDefinedUsagesFromFiles(
-            @Nonnull final Collection<String> filenames,
-            @Nonnull final Map<String,String> templatesAndProperties,
-            @Nonnull final Charset charset)
+    @NonNull Set<String> readDefinedUsagesFromFiles(
+            final @NonNull Collection<String> filenames,
+            final @NonNull Map<String,String> templatesAndProperties,
+            final @NonNull Charset charset)
             throws IOException {
         final Set<String> results = new HashSet<>();
         final Map<Pattern,String> tplPatterns = new HashMap<>();
@@ -67,11 +60,10 @@ class UsageFiles {
      *                  can be used to separate proper usage patterns for properties.
      * @return Map of usages not found and their location (file, row).
      */
-    @Nonnull
-    Set<UsageLocation> readAllUsagesFromFiles(
-            @Nonnull final Collection<String> filenames,
-            @Nonnull final Set<String> templates,
-            @Nonnull final Charset charset)
+    @NonNull Set<UsageLocation> readAllUsagesFromFiles(
+            final @NonNull Collection<String> filenames,
+            final @NonNull Set<String> templates,
+            final @NonNull Charset charset)
             throws IOException {
         final Set<UsageLocation> foundProperties = new HashSet<>();
         final ArrayList<Pattern> tplPatterns = new ArrayList<>();
@@ -87,9 +79,10 @@ class UsageFiles {
                     final Matcher matcher = tplP.matcher(row);
                     if (matcher.find()) {
                         log.debug("            Pattern match found (" + filename + ":" + rowNr + ")" + ", pattern '" + tplP.pattern() + "'.");
-                        final String propname = matcher.group(1);
-                        log.debug("            Extracted property '" + propname + "'.");
-                        foundProperties.add(new UsageLocation(propname, rowNr, filename));
+                        @SuppressWarnings("nullness")
+                        final @NonNull String propName = matcher.group(1);
+                        log.debug("            Extracted property '" + propName + "'.");
+                        foundProperties.add(new UsageLocation(propName, rowNr, filename));
                     }
                     rowNr += 1;
                 }
@@ -100,27 +93,24 @@ class UsageFiles {
 
     static class UsageLocation {
 
-        @Nonnull
-        private String property;
+        private @NonNull String property;
 
         private int row;
 
-        @Nonnull
-        private String filename;
+        private @NonNull String filename;
 
         /**
          * @param propertyVal Property name
          * @param rowVal      number
          * @param filenameVal Name of file
          */
-        UsageLocation(@Nonnull final String propertyVal, final int rowVal, @Nonnull final String filenameVal) {
+        UsageLocation(final @NonNull String propertyVal, final int rowVal, final @NonNull String filenameVal) {
             property = propertyVal;
             row = rowVal;
             filename = filenameVal;
         }
 
-        @Nonnull
-        public String getProperty() {
+        public @NonNull String getProperty() {
             return property;
         }
 
@@ -128,8 +118,7 @@ class UsageFiles {
             return row;
         }
 
-        @Nonnull
-        String getFilename() {
+        public @NonNull String getFilename() {
             return filename;
         }
     }

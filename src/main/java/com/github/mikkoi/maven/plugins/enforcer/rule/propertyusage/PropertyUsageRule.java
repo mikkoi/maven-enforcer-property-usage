@@ -5,16 +5,16 @@ import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
-import com.google.common.base.Charsets;
+//import com.google.common.base.Charsets;
 import org.apache.maven.enforcer.rule.api.*;
-import org.apache.maven.plugin.logging.Log;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -38,31 +38,27 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
     /**
      * Default character set for all files to read.
      */
-    private static final Charset DEFAULT_CHAR_SET = Charsets.UTF_8;
+    private static final Charset DEFAULT_CHAR_SET = StandardCharsets.UTF_8;
 
     /**
      * Properties which were defined more than once.
      */
-    @Nonnull
-    private final Map<String, Integer> propertiesDefinedMoreThanOnce = new ConcurrentHashMap<>();
+    private final @NonNull Map<String, Integer> propertiesDefinedMoreThanOnce = new ConcurrentHashMap<>();
 
     /**
      * Properties which were not found in usages.
      */
-    @Nonnull
-    private final Set<String> propertiesNotUsed = new HashSet<>();
+    private final @NonNull Set<String> propertiesNotUsed = new HashSet<>();
 
     /**
      * Properties which were used in usages but not defined in definitions.
      */
-    @Nonnull
-    private final Set<UsageFiles.UsageLocation> propertiesNotDefined = new HashSet<>();
+    private final @NonNull Set<UsageFiles.UsageLocation> propertiesNotDefined = new HashSet<>();
 
     /**
      * All properties defined.
      */
-    @Nonnull
-    private final Map<String, Set<PropertyDefinition>> propertiesDefined = new ConcurrentHashMap<>();
+    private final @NonNull Map<String, Set<PropertyDefinition>> propertiesDefined = new ConcurrentHashMap<>();
 
     //
     // Following variables match the configuration items
@@ -103,31 +99,26 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
     /**
      * Replace this string with property name in template(s).
      */
-    @Nonnull
-    private String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
+    private @NonNull String replaceInTemplateWithPropertyName = Templates.DEFAULT_REPLACE_IN_TEMPLATE_WITH_PROPERTY_NAME;
 
     /**
      * Replace template property name placeholder with this
      * when searching for properties.
      */
-    @Nonnull
-    private String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;//NOPMD
+    private @NonNull String propertyNameRegexp = Templates.PROPERTY_NAME_REGEXP;//NOPMD
 
     /**
      * Definitions
      */
-    @Nonnull
-    private Collection<String> definitions = Definitions.getDefault();
+    private @NonNull Collection<String> definitions = Definitions.getDefault();
     /**
      * Templates
      */
-    @Nonnull
-    private Collection<String> templates = Templates.getDefault();
+    private @NonNull Collection<String> templates = Templates.getDefault();
     /**
      * Usages
      */
-    @Nonnull
-    private Collection<String> usages = Usages.getDefault();
+    private @NonNull Collection<String> usages = Usages.getDefault();
 
     // Inject needed Maven components
 
@@ -141,11 +132,11 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
         this.project = Objects.requireNonNull(project);
     }
 
-    @Inject
-    private MavenSession session;
-
-    @Inject
-    private RuntimeInformation runtimeInformation;
+//    @Inject
+//    private MavenSession session;
+//
+//    @Inject
+//    private RuntimeInformation runtimeInformation;
 
     /**
      * @throws EnforcerRuleException Throws when error
@@ -354,8 +345,7 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
      * @return Always false here.
      */
     @Override
-    @Nullable
-    public String getCacheId() {
+    public @NonNull String getCacheId() {
         return Boolean.toString(false);
     }
 
@@ -368,7 +358,7 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
      */
     // TODO
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.format("PropertyUsageRule[]");
     }
 
@@ -376,23 +366,20 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
      * Getters for results, used for testing.
      */
 
-    @Nonnull
-    public Set<String> getPropertiesNotUsed() {
+
+    public @NonNull Set<String> getPropertiesNotUsed() {
         return propertiesNotUsed;
     }
 
-    @Nonnull
-    public Set<UsageFiles.UsageLocation> getPropertiesNotDefined() {
+    public @NonNull Set<UsageFiles.UsageLocation> getPropertiesNotDefined() {
         return propertiesNotDefined;
     }
 
-    @Nonnull
-    public Map<String, Integer> getPropertiesDefinedMoreThanOnce() {
+    public @NonNull Map<String, Integer> getPropertiesDefinedMoreThanOnce() {
         return propertiesDefinedMoreThanOnce;
     }
 
-    @Nonnull
-    public Map<String, Set<PropertyDefinition>> getPropertiesDefined() {
+    public @NonNull Map<String, Set<PropertyDefinition>> getPropertiesDefined() {
         return propertiesDefined;
     }
 
@@ -420,17 +407,15 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
         this.definitionsOnlyOnce = definitionsOnlyOnce;
     }
 
-    @Nonnull
-    public String getReplaceInTemplateWithPropertyName() {
+    public @NonNull String getReplaceInTemplateWithPropertyName() {
         return replaceInTemplateWithPropertyName;
     }
 
-    public void setReplaceInTemplateWithPropertyName(@Nonnull final String replaceInTemplateWithPropertyName) {
+    public void setReplaceInTemplateWithPropertyName(final @NonNull String replaceInTemplateWithPropertyName) {
         this.replaceInTemplateWithPropertyName = replaceInTemplateWithPropertyName;
     }
 
-    @Nonnull
-    public Collection<String> getDefinitions() {
+    public @NonNull Collection<String> getDefinitions() {
         return definitions;
     }
 
@@ -439,25 +424,23 @@ public final class PropertyUsageRule extends AbstractEnforcerRule {
      * (these are not used by Maven Enforcer, used for testing).
      */
 
-    public void setDefinitions(@Nonnull final Collection<String> definitions) {
+    public void setDefinitions(final @NonNull Collection<String> definitions) {
         this.definitions = definitions;
     }
 
-    @Nonnull
-    public Collection<String> getTemplates() {
+    public @NonNull Collection<String> getTemplates() {
         return templates;
     }
 
-    public void setTemplates(@Nonnull final Collection<String> templates) {
+    public void setTemplates(final @NonNull Collection<String> templates) {
         this.templates = templates;
     }
 
-    @Nonnull
-    public Collection<String> getUsages() {
+    public @NonNull Collection<String> getUsages() {
         return usages;
     }
 
-    public void setUsages(@Nonnull final Collection<String> usages) {
+    public void setUsages(final @NonNull Collection<String> usages) {
         this.usages = usages;
     }
 }

@@ -1,9 +1,10 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
-import org.apache.maven.plugin.logging.Log;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.regex.qual.Regex;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,13 +12,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +30,7 @@ class PropertyFiles {
     private final Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}(.{0,})$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
     private final Pattern multiLineP = Pattern.compile("\\\\{1}[\\s]{0,}$");
 
-    PropertyFiles(@Nonnull final EnforcerLogger logger, @Nonnull final Charset cset) {
+    PropertyFiles(final @NonNull EnforcerLogger logger, final @NonNull Charset cset) {
         log = logger;
         charset = cset;
     }
@@ -44,8 +39,7 @@ class PropertyFiles {
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and how many times they are defined.
      */
-    @Nonnull
-    Map<String, Integer> readPropertiesFromFilesWithoutCount(@Nonnull final Collection<String> filenames)
+    @NonNull Map<String, Integer> readPropertiesFromFilesWithoutCount(final @NonNull Collection<String> filenames)
             throws IOException {
         Map<String, Integer> results = new HashMap<>();
         for (String filename : filenames) {
@@ -70,8 +64,8 @@ class PropertyFiles {
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and how many times they are defined.
      */
-    @Nonnull
-    Map<String, Integer> readPropertiesFromFilesWithCount(@Nonnull final Collection<String> filenames)
+    @NonNull
+    Map<String, Integer> readPropertiesFromFilesWithCount(final @NonNull Collection<String> filenames)
             throws IOException {
         final Map<String, Integer> results = new HashMap<>();
         log.debug("commentLineP:" + commentLineP.pattern());
@@ -92,8 +86,7 @@ class PropertyFiles {
      * @param filenames Collection of file names to read properties from.
      * @return Map of definitions and PropertyDefinitions
      */
-    @Nonnull
-    Map<String, Set<PropertyDefinition>> readPropertiesFromFilesGetDefinitions(@Nonnull final Collection<String> filenames)
+    @NonNull Map<String, Set<PropertyDefinition>> readPropertiesFromFilesGetDefinitions(final @NonNull Collection<String> filenames)
             throws IOException {
         final Map<String, Set<PropertyDefinition>> results = new HashMap<>();
         log.debug("commentLineP:" + commentLineP.pattern());
@@ -127,8 +120,7 @@ class PropertyFiles {
             "squid:S134",  // Control flow statements "if", "for", "while", "switch" and "try" should not be nested too deeply
             "squid:S135"   // Loops should not contain more than a single "break" or "continue" statement
     })
-    @Nonnull
-    Map<String, Integer> readPropertiesFromFileWithCount(@Nonnull final String filename)
+    @NonNull Map<String, Integer> readPropertiesFromFileWithCount(final @NonNull String filename)
             throws IOException {
         final Map<String, Integer> results = new HashMap<>();
         List<String> rows = Files.readAllLines(Paths.get(filename), charset);
@@ -137,12 +129,12 @@ class PropertyFiles {
         for (String row : rows) {
             linenumber++;
             log.debug("    Reading property row '" + row + "' (" + linenumber + ").");
-            Matcher commentLineM = commentLineP.matcher(row);
+            final @Regex(0) Matcher commentLineM = commentLineP.matcher(row);
             if (commentLineM.find()) {
                 log.debug("        This is comment line.");
                 continue;
             }
-            Matcher multiLineM = multiLineP.matcher(row);
+            final @Regex(0) Matcher multiLineM = multiLineP.matcher(row);
             if (multiLineM.find()) {
                 if (readingMultiLineDefinition) {
                     log.debug("        This is multirow (not first row)");
@@ -158,16 +150,18 @@ class PropertyFiles {
                     continue;
                 }
             }
-            Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
+            final @Regex(1) Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
             if (simplePropertyLineM.find()) {
                 log.debug("        This is simple property line.");
+                @SuppressWarnings("nullness")
                 final String key = simplePropertyLineM.group(1).trim();
                 storePropertyName(key, results);
                 continue;
             }
-            Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
+            final @Regex(1) Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
             if (notSimplePropertyLineM.find()) {
                 log.debug("        This is not simple property line.");
+                @SuppressWarnings("nullness")
                 final String key = notSimplePropertyLineM.group(1).trim();
                 storePropertyName(key, results);
                 continue;
@@ -188,8 +182,7 @@ class PropertyFiles {
             "squid:S134",  // Control flow statements "if", "for", "while", "switch" and "try" should not be nested too deeply
             "squid:S135"   // Loops should not contain more than a single "break" or "continue" statement
     })
-    @Nonnull
-    Map<String, Set<PropertyDefinition>> readPropertiesFromFileGetDefinitions(@Nonnull final String filename)
+    @NonNull Map<String, Set<PropertyDefinition>> readPropertiesFromFileGetDefinitions(final @NonNull String filename)
             throws IOException {
         final Map<String, Set<PropertyDefinition>> propertyDefinitions = new HashMap<>();
         List<String> rows = Files.readAllLines(Paths.get(filename), charset);
@@ -198,12 +191,12 @@ class PropertyFiles {
         for (String row : rows) {
             linenumber++;
             log.debug("    Reading property row '" + row + "' (" + linenumber + ").");
-            Matcher commentLineM = commentLineP.matcher(row);
+            final @Regex(2) Matcher commentLineM = commentLineP.matcher(row);
             if (commentLineM.find()) {
                 log.debug("        This is comment line.");
                 continue;
             }
-            Matcher multiLineM = multiLineP.matcher(row);
+            final @Regex(0) Matcher multiLineM = multiLineP.matcher(row);
             if (multiLineM.find()) {
                 if (readingMultiLineDefinition) {
                     log.debug("        This is multirow (not first row)");
@@ -219,19 +212,23 @@ class PropertyFiles {
                     continue;
                 }
             }
-            Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
+            final @Regex(2) Matcher simplePropertyLineM = simplePropertyLineP.matcher(row);
             if (simplePropertyLineM.find()) {
                 log.debug("        This is simple property line.");
+                @SuppressWarnings("nullness")
                 final String key = simplePropertyLineM.group(1).trim();
+                @SuppressWarnings("nullness")
                 final String value = simplePropertyLineM.group(2).trim();
                 storePropertyDefinition(key, value, filename, linenumber, propertyDefinitions);
                 continue;
             }
-            Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
+            final @Regex(2) Matcher notSimplePropertyLineM = notSimplePropertyLineP.matcher(row);
             if (notSimplePropertyLineM.find()) {
                 log.debug("        This is not simple property line.");
-                final String key = notSimplePropertyLineM.group(1).trim();
-                final String value = notSimplePropertyLineM.group(2).trim();
+                @SuppressWarnings("nullness")
+                final String key = Objects.requireNonNull(notSimplePropertyLineM.group(1)).trim();
+                @SuppressWarnings("nullness")
+                final String value = Objects.requireNonNull(notSimplePropertyLineM.group(2)).trim();
                 storePropertyDefinition(key, value, filename, linenumber, propertyDefinitions);
                 continue;
             }
@@ -240,7 +237,7 @@ class PropertyFiles {
         return propertyDefinitions;
     }
 
-    private void storePropertyName(@Nonnull final String key, @Nonnull final Map<String, Integer> properties) {
+    private void storePropertyName(final @NonNull String key, final @NonNull Map<String, Integer> properties) {
         log.debug("            Reading property " + key + ".");
         if (!properties.containsKey(key)) {
             log.debug("            Not defined before.");
@@ -251,7 +248,7 @@ class PropertyFiles {
         }
     }
 
-    private void storePropertyDefinition(@Nonnull final String key, @Nonnull final String value, @Nonnull final String filename, final int linenumber, @Nonnull final Map<String, Set<PropertyDefinition>> propertyDefinitions) {
+    private void storePropertyDefinition(final @NonNull String key, final @NonNull String value, final @NonNull String filename, final int linenumber, final @NonNull Map<String, Set<PropertyDefinition>> propertyDefinitions) {
         log.debug("            Reading property " + key + ".");
         if (propertyDefinitions.containsKey(key)) {
             log.debug("            Defined before.");

@@ -1,45 +1,42 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
-import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
 public class PropertyDefinition {
 
-	@Nonnull
-	private String key;
-	@Nonnull
-	private String value;
-	@Nonnull
-	private String filename;
-	@Nonnull
-	private int linenumber;
 
-	public PropertyDefinition(@Nonnull String key, @Nonnull String value, @Nonnull String filename,
-			@Nonnull int linenumber) {
-		Objects.requireNonNull(key);
-		Objects.requireNonNull(value);
-		Objects.requireNonNull(filename);
-		this.key = key;
-		this.value = value;
-		this.filename = filename;
-		this.linenumber = linenumber;
-	}
+    private final @NonNull String key;
+    private final @NonNull String value;
+    private final @NonNull String filename;
+    private final int linenumber;
 
-	public String getKey() {
-		return key;
-	}
+    public PropertyDefinition(final @NonNull String key, final @NonNull String value, final @NonNull String filename,
+                              final int linenumber) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+        Objects.requireNonNull(filename);
+        this.key = key;
+        this.value = value;
+        this.filename = filename;
+        this.linenumber = linenumber;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public @NonNull String getKey() {
+        return key;
+    }
 
-	public String getFilename() {
-		return filename;
-	}
+    public @NonNull String getValue() {
+        return value;
+    }
 
-	public int getLinenumber() {
-		return linenumber;
-	}
+    public @NonNull String getFilename() {
+        return filename;
+    }
+
+    public int getLinenumber() {
+        return linenumber;
+    }
 
 }

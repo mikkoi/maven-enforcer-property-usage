@@ -1,10 +1,8 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration;
 
-import org.apache.maven.enforcer.rule.api.EnforcerLevel;
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -25,11 +23,6 @@ public class FileSpecsTest {
 
     public EnforcerLogger enforcerLogger = new EnforcerLogger() {
         protected final Log log = new SystemStreamLog();
-//            protected final Log log;
-//
-//            protected EnforcerLogger(Log log) {
-//                this.log = Objects.requireNonNull(log, "log must be not null");
-//            }
 
         @Override
         public void warnOrError(CharSequence message) {
@@ -114,20 +107,6 @@ public class FileSpecsTest {
     public void getFilenamesFromFileSpecs() throws Exception {
         SystemStreamLog slog = new SystemStreamLog();
 
-//        EnforcerLogger enforcerLoggerError = new EnforcerLoggerError(log);
-//        EnforcerLogger enforcerLoggerWarn = new EnforcerLoggerWarn(log);
-//
-//        for (PlexusConfiguration ruleConfig : rules.getChildren()) {
-//            // we need rule level before configuration in order to proper set logger
-//            EnforcerLevel ruleLevel = getRuleLevelFromConfig(ruleConfig);
-//
-//            EnforcerRuleDesc ruleDesc = createRuleDesc(ruleConfig.getName(), ruleConfig.getAttribute("implementation"));
-//            // setup logger before rule configuration
-//            ruleDesc.getRule().setLog(ruleLevel == EnforcerLevel.ERROR ? enforcerLoggerError : enforcerLoggerWarn);
-
-
-
-
         File tempFile = testDir.newFile();
         Collection<String> files = Arrays.asList(
                 "src/test/resources/properties-dir/**/*.properties",
@@ -150,15 +129,11 @@ public class FileSpecsTest {
 
     @Test
     public void getFilenamesFromFileSpecs_noFiles() throws Exception {
-//        SystemStreamLog slog = new SystemStreamLog();
         Collection<String> files = Arrays.asList(
                 absoluteCwdAndFile("src/test/resources/no-exist-dir/*.properties"),
                 absoluteCwdAndFile("src/test/resources/no-way.properties")
         );
         Collection<String> expected = Collections.emptySet();
-//        expected = expected.stream().sorted().collect(Collectors.toSet());
-//        Collection<String> filenames = FileSpecs.getAbsoluteFilenames(files, Paths.get("").toAbsolutePath(), enforcerLogger);
-//        filenames = filenames.stream().sorted().collect(Collectors.toSet());
         Collection<String> filenames = new HashSet<>(FileSpecs
                 .getAbsoluteFilenames(files, Paths.get("").toAbsolutePath(), enforcerLogger));
         assertEquals("Filenames are as expected (none).", expected, filenames);
