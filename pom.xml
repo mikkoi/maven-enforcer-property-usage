@@ -139,20 +139,20 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.apache.maven.enforcer</groupId>
-                <artifactId>enforcer-rules</artifactId>
-                <version>${enforcer.api.version}</version>
-                <type>jar</type>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.enforcer</groupId>
-                <artifactId>enforcer-rules</artifactId>
-                <version>${enforcer.api.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.apache.maven.enforcer</groupId>-->
+<!--                <artifactId>enforcer-rules</artifactId>-->
+<!--                <version>${enforcer.api.version}</version>-->
+<!--                <type>jar</type>-->
+<!--                <scope>compile</scope>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.apache.maven.enforcer</groupId>-->
+<!--                <artifactId>enforcer-rules</artifactId>-->
+<!--                <version>${enforcer.api.version}</version>-->
+<!--                <type>test-jar</type>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
@@ -174,17 +174,17 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-container-default</artifactId>
-                <version>1.5.5</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.codehaus.plexus</groupId>-->
+<!--                <artifactId>plexus-container-default</artifactId>-->
+<!--                <version>1.5.5</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>*</groupId>-->
+<!--                        <artifactId>*</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
 
             <!-- Test -->
             <dependency>
@@ -193,8 +193,18 @@
                 <version>4.13.1</version>
             </dependency>
             <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.9.1</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
+                <version>4.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
                 <version>4.11.0</version>
             </dependency>
 
@@ -209,11 +219,6 @@
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-annotations</artifactId>
-                <version>4.7.3</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
@@ -240,12 +245,12 @@
             <artifactId>enforcer-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.enforcer</groupId>
-            <artifactId>enforcer-rules</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.maven.enforcer</groupId>-->
+<!--            <artifactId>enforcer-rules</artifactId>-->
+<!--            <type>test-jar</type>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
@@ -256,20 +261,20 @@
             <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.enforcer</groupId>
-            <artifactId>enforcer-rules</artifactId>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.maven.enforcer</groupId>-->
+<!--            <artifactId>enforcer-rules</artifactId>-->
+<!--            <type>jar</type>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.codehaus.plexus</groupId>-->
+<!--            <artifactId>plexus-container-default</artifactId>-->
+<!--        </dependency>-->
 
         <!-- test -->
         <dependency>
@@ -282,12 +287,28 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- QA -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.8.6</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
@@ -558,9 +579,9 @@
                         <arg>-Xlint:all</arg>
 
                         <!-- For error-prone compiler plugin -->
-                        <arg>-XDcompilePolicy=simple</arg>
-                        <arg>--should-stop=ifError=FLOW</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
+<!--                        <arg>-XDcompilePolicy=simple</arg>-->
+<!--                        <arg>&#45;&#45;should-stop=ifError=FLOW</arg>-->
+<!--                        <arg>-Xplugin:ErrorProne</arg>-->
 
                         <!-- For issues with error-prone, see: https://errorprone.info/docs/installation#maven -->
                         <!-- Add the following to the .mvn/jvm.config file: -->
@@ -575,18 +596,18 @@
                         <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED-->
                         <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED-->
                     </compilerArgs>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>${error-prone.version}</version>
-                        </path>
-                        <!-- Other annotation processors go here.
+<!--                    <annotationProcessorPaths>-->
+<!--                        <path>-->
+<!--                            <groupId>com.google.errorprone</groupId>-->
+<!--                            <artifactId>error_prone_core</artifactId>-->
+<!--                            <version>${error-prone.version}</version>-->
+<!--                        </path>-->
+<!--                        &lt;!&ndash; Other annotation processors go here.-->
 
-                        If 'annotationProcessorPaths' is set, processors will no longer be
-                        discovered on the regular -classpath; see also 'Using Error Prone
-                        together with other annotation processors' below. -->
-                    </annotationProcessorPaths>
+<!--                        If 'annotationProcessorPaths' is set, processors will no longer be-->
+<!--                        discovered on the regular -classpath; see also 'Using Error Prone-->
+<!--                        together with other annotation processors' below. &ndash;&gt;-->
+<!--                    </annotationProcessorPaths>-->
                 </configuration>
             </plugin>
             <plugin>
@@ -600,9 +621,9 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
-                            <ignoredUnusedDeclaredDependencies>
-                                <dependency>org.apache.maven.enforcer:enforcer-rules:jar:1.4.1</dependency>
-                            </ignoredUnusedDeclaredDependencies>
+<!--                            <ignoredUnusedDeclaredDependencies>-->
+<!--                                <dependency>org.apache.maven.enforcer:enforcer-rules:jar:1.4.1</dependency>-->
+<!--                            </ignoredUnusedDeclaredDependencies>-->
                         </configuration>
                     </execution>
                 </executions>
@@ -679,7 +700,8 @@
                 </executions>
                 <configuration>
                     <runOrder>random</runOrder>
-                    <argLine>-XX:MaxPermSize=512m</argLine>
+                    <!-- OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=512m; support was removed in 8.0 -->
+                    <!-- <argLine>-XX:MaxPermSize=512m</argLine>-->
                     <!--&lt;!&ndash; Sets the VM argument line used when unit tests are run. &ndash;&gt;-->
                     <!--<argLine>${surefireArgLine}</argLine>-->
                     <!-- Skips unit tests if the value of skip.unit.tests property is true -->
@@ -964,6 +986,56 @@
                 </plugins>
             </reporting>
         </profile>
+
+        <profile>
+            <id>error-prone</id>
+            <properties>
+                <java.version>17</java.version>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs>
+                                <!-- For error-prone compiler plugin -->
+<!--                                <arg>-XDcompilePolicy=simple</arg>-->
+<!--                                <arg>&#45;&#45;should-stop=ifError=FLOW</arg>-->
+<!--                                <arg>-Xplugin:ErrorProne</arg>-->
+
+                                <!-- For issues with error-prone, see: https://errorprone.info/docs/installation#maven -->
+                                <!-- Add the following to the .mvn/jvm.config file: -->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED-->
+                                <!--    &#45;&#45;add-opens jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED-->
+                            </compilerArgs>
+<!--                            <annotationProcessorPaths>-->
+<!--                                <path>-->
+<!--                                    <groupId>com.google.errorprone</groupId>-->
+<!--                                    <artifactId>error_prone_core</artifactId>-->
+<!--                                    <version>${error-prone.version}</version>-->
+<!--                                </path>-->
+<!--                                &lt;!&ndash; Other annotation processors go here.-->
+
+<!--                                If 'annotationProcessorPaths' is set, processors will no longer be-->
+<!--                                discovered on the regular -classpath; see also 'Using Error Prone-->
+<!--                                together with other annotation processors' below. &ndash;&gt;-->
+<!--                            </annotationProcessorPaths>-->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 
     <reporting>

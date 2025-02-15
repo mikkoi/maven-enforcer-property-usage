@@ -1,5 +1,6 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
+import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.plugin.logging.Log;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
  */
 class PropertyFiles {
 
-    private final Log log;
+    private final EnforcerLogger log;
 
     private final Charset charset;
 
@@ -34,7 +35,7 @@ class PropertyFiles {
     private final Pattern notSimplePropertyLineP = Pattern.compile("^[\\s]{0,}([\\S]{1,})[\\s]{0,}(.{0,})$", Pattern.COMMENTS | Pattern.UNICODE_CHARACTER_CLASS);
     private final Pattern multiLineP = Pattern.compile("\\\\{1}[\\s]{0,}$");
 
-    PropertyFiles(@Nonnull final Log logger, @Nonnull final Charset cset) {
+    PropertyFiles(@Nonnull final EnforcerLogger logger, @Nonnull final Charset cset) {
         log = logger;
         charset = cset;
     }

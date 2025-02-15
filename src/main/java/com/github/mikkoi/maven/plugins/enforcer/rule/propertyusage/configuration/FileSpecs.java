@@ -1,6 +1,6 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration;
 
-import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -40,7 +40,7 @@ public class FileSpecs {
     public static Collection<String> getAbsoluteFilenames(
             @Nonnull final Collection<String> files,
             @Nonnull final Path basedir,
-            @Nonnull final Log log
+            @Nonnull final EnforcerLogger log
             ) {
         Collection<String> allFilenames = new HashSet<>();
         if(!files.isEmpty()) {

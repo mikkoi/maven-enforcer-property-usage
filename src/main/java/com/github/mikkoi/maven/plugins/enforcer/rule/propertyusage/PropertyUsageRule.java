@@ -5,9 +5,8 @@ import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Templates;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.Usages;
-import org.apache.maven.enforcer.rule.api.EnforcerRule;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import com.google.common.base.Charsets;
+import org.apache.maven.enforcer.rule.api.*;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.StringUtils;
@@ -18,22 +17,28 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.rtinfo.RuntimeInformation;
+
 /**
- * Verifies for usage of properties mentioned in .properties files.
+ * Custom Enforcer Rule - Verifies the usage of properties mentioned in .properties files.
  */
-public final class PropertyUsageRule implements EnforcerRule {
+@Named("PropertyUsageRule")
+public final class PropertyUsageRule extends AbstractEnforcerRule {
 
     /**
      * Default character set for all files to read.
      */
-    private static final Charset DEFAULT_CHAR_SET = Charset.forName("UTF-8");
+    private static final Charset DEFAULT_CHAR_SET = Charsets.UTF_8;
 
     /**
      * Properties which were defined more than once.
@@ -59,15 +64,10 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     private final Map<String, Set<PropertyDefinition>> propertiesDefined = new ConcurrentHashMap<>();
 
-    /**
-     * Logger given by Maven Enforcer.
-     */
-    Log log;
-
     //
     // Following variables match the configuration items
     // and are populated by Maven/Enforcer, despite being private. (!)
-    // I'm not sure I want to known how it happens.
+    // I'm not sure if I want to know how it happens.
     //
 
     /**
@@ -129,8 +129,25 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Nonnull
     private Collection<String> usages = Usages.getDefault();
 
+    // Inject needed Maven components
+
+//    @Inject
+//    private MavenProject project;
+
+    private final MavenProject project;
+
+    @Inject
+    public PropertyUsageRule(MavenProject project) {
+        this.project = Objects.requireNonNull(project);
+    }
+
+    @Inject
+    private MavenSession session;
+
+    @Inject
+    private RuntimeInformation runtimeInformation;
+
     /**
-     * @param helper EnforcerRuleHelper
      * @throws EnforcerRuleException Throws when error
      */
     @Override
@@ -140,34 +157,41 @@ public final class PropertyUsageRule implements EnforcerRule {
             "squid:S1192",  // String literals should not be duplicated
             "squid:MethodCyclomaticComplexity"
     })
-    //@SuppressWarnings("squid:S1192")
-    public void execute(@Nonnull final EnforcerRuleHelper helper)
-            throws EnforcerRuleException {
-        log = helper.getLog();
+    public void execute() throws EnforcerRuleException {
+        final EnforcerLogger log = getLog();
 
-        Path basedir = Paths.get("");
-        try {
-            basedir = Paths.get(helper.evaluate("${project.basedir}").toString());
-        } catch (ExpressionEvaluationException e) {
-            log.error("Cannot get property 'project.basedir'. Using current working directory. Error:" + e);
+        Properties properties = project.getProperties();
+        String projectBasedirProperty = properties.getProperty("project.basedir");
+        if(projectBasedirProperty == null) {
+            log.error("Cannot get property 'project.basedir'. Using current working directory");
+            projectBasedirProperty = "";
         }
+        final Path basedir = Paths.get(projectBasedirProperty);
 
-        Charset propertiesEnc = DEFAULT_CHAR_SET;
-        Charset sourceEnc = DEFAULT_CHAR_SET;
-        try {
-            if (StringUtils.isNotBlank(propertiesEncoding)) {
-                propertiesEnc = Charset.forName(propertiesEncoding);
-            } else {
-                propertiesEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
-            }
-            if (StringUtils.isNotBlank(sourceEncoding)) {
-                sourceEnc = Charset.forName(sourceEncoding);
-            } else {
-                sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
-            }
-        } catch (ExpressionEvaluationException e) {
-            log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
+//        Charset propertiesEnc;
+//        Charset sourceEnc = DEFAULT_CHAR_SET;
+//        try {
+//            if (StringUtils.isNotBlank(propertiesEncoding)) {
+//                propertiesEnc = Charset.forName(propertiesEncoding);
+//            } else {
+//                propertiesEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+//            }
+//            if (StringUtils.isNotBlank(sourceEncoding)) {
+//                sourceEnc = Charset.forName(sourceEncoding);
+//            } else {
+//                sourceEnc = Charset.forName(helper.evaluate("${project.build.sourceEncoding}").toString());
+//            }
+//        } catch (ExpressionEvaluationException e) {
+//            log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8). Error:" + e);
+//        }
+        String projectBuildSourceEncodingProperty = project.getProperties().getProperty("project.build.sourceEncoding", DEFAULT_CHAR_SET.toString());
+        if(projectBuildSourceEncodingProperty == null) {
+            projectBuildSourceEncodingProperty = DEFAULT_CHAR_SET.toString();
+        } else {
+                log.error("Cannot get property 'project.build.sourceEncoding'. Using default (UTF-8)");
         }
+        final Charset propertiesEnc = Charset.forName(StringUtils.isNotBlank(propertiesEncoding) ? propertiesEncoding : projectBuildSourceEncodingProperty);
+        final Charset sourceEnc = Charset.forName(StringUtils.isNotBlank(sourceEncoding) ? sourceEncoding : projectBuildSourceEncodingProperty);
 
         log.debug("PropertyUsageRule:execute() - Settings:");
         log.debug("basedir:" + basedir);
@@ -291,6 +315,7 @@ public final class PropertyUsageRule implements EnforcerRule {
     }
 
     private Map<String, Integer> getPropertiesDefinedMoreThanOnce(final Charset propertiesEnc, final Collection<String> propertyFilenames) throws IOException {
+        final EnforcerLogger log = getLog();
         Map<String, Integer> definedProperties;
         if (definitionsOnlyOnce) {
             definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesWithCount(propertyFilenames);
@@ -308,6 +333,7 @@ public final class PropertyUsageRule implements EnforcerRule {
 
     private Map<String, Set<PropertyDefinition>> getPropertiesDefined(final Charset propertiesEnc, final Collection<String> propertyFilenames) throws IOException {
         Map<String, Set<PropertyDefinition>> definedProperties;
+        final EnforcerLogger log = getLog();
         definedProperties = new PropertyFiles(log, propertiesEnc).readPropertiesFromFilesGetDefinitions(propertyFilenames);
         return definedProperties;
     }
@@ -330,37 +356,20 @@ public final class PropertyUsageRule implements EnforcerRule {
     @Override
     @Nullable
     public String getCacheId() {
-        return String.valueOf(false);
+        return Boolean.toString(false);
     }
 
     /**
-     * This tells the system if the results are cacheable at
-     * all. Keep in mind that during forked builds and other things,
-     * a given rule may be executed more than once for the same
-     * project. This means that even things that change from
-     * project to project may still be cacheable in certain instances.
+     * A good practice is provided toString method for Enforcer Rule.
+     * <p>
+     * Output is used in verbose Maven logs, can help during investigate problems.
      *
-     * @return Always false here.
+     * @return rule description
      */
+    // TODO
     @Override
-    public boolean isCacheable() {
-        return false;
-    }
-
-    /**
-     * If the rule is cacheable and the same id is found in the cache,
-     * the stored results are passed to this method to allow double
-     * checking of the results. Most of the time this can be done
-     * by generating unique ids, but sometimes the results of objects returned
-     * by the helper need to be queried. You may for example, store certain
-     * objects in your rule and then query them later.
-     *
-     * @param arg0 EnforcerRule
-     * @return Always false here.
-     */
-    @Override
-    public boolean isResultValid(@Nullable final EnforcerRule arg0) {
-        return false;
+    public String toString() {
+        return String.format("PropertyUsageRule[]");
     }
 
     /**

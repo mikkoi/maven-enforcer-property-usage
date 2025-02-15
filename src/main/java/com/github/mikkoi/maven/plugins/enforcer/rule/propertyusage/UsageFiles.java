@@ -1,5 +1,6 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
+import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.plugin.logging.Log;
 
 import javax.annotation.Nonnull;
@@ -21,9 +22,9 @@ import java.util.regex.Pattern;
  */
 class UsageFiles {
 
-    private final Log log;
+    private final EnforcerLogger log;
 
-    UsageFiles(final Log log) {
+    UsageFiles(final EnforcerLogger log) {
         this.log = log;
     }
 
