@@ -35,6 +35,7 @@ public final class PropertyUsageRuleTest {
     @SuppressWarnings("nullness")
     @TempDir
     private static java.nio.file.Path testDir;
+
     @SuppressWarnings("nullness")
     @Mock
     private MavenProject project;// = mock(MavenProject.class);
@@ -62,8 +63,6 @@ public final class PropertyUsageRuleTest {
             final @NonNull Collection<String> propertiesNotUsed, // These names were never used.
             final @NonNull Collection<String> propertiesNotDefined // These names were not defined.
     ) {
-        boolean isValid;
-
         // Configuration.
         if (definitionsOnlyOnce != null) {
             rule.setDefinitionsOnlyOnce(definitionsOnlyOnce);
@@ -92,14 +91,10 @@ public final class PropertyUsageRuleTest {
         // Run rule.
         try {
             rule.execute();
-            isValid = true;
+            Assertions.assertTrue(rulePasses, "Success as expected.");
         } catch (EnforcerRuleException e) {
-            if (!rulePasses) {
-                System.err.println("Rule broken. Error:" + e.getLocalizedMessage());
-            }
-            isValid = false;
+            Assertions.assertFalse(rulePasses, "Failure as expected.");
         }
-        Assertions.assertEquals(isValid, rulePasses, "Success or failure is as expected.");
         assertTrue(!rule.isDefinedPropertiesAreUsed() || rule.getPropertiesNotUsed().equals(propertiesNotUsed), "Properties not used as expected.");
         final Set<String> resultPropertiesNodDefined = new HashSet<>();
         rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNodDefined.add(val.getProperty()));
