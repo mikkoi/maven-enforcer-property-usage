@@ -6,7 +6,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.regex.qual.Regex;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

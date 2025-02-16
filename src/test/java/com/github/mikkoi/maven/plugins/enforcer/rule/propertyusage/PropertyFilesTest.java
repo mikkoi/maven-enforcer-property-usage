@@ -1,8 +1,6 @@
 package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -12,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,89 +17,90 @@ public class PropertyFilesTest {
 
 //    private SystemStreamLog enforcerLogger = new SystemStreamLog();
 
-    public EnforcerLogger enforcerLogger = new EnforcerLogger() {
-        final Log log = new SystemStreamLog();
-
-        @Override
-        public void warnOrError(CharSequence message) {
-
-        }
-
-        @Override
-        public void warnOrError(Supplier<CharSequence> messageSupplier) {
-
-        }
-
-        @Override
-        public boolean isDebugEnabled() {
-//            return log.isDebugEnabled();
-            return false;
-        }
-
-        @Override
-        public void debug(CharSequence message) {
-//            log.debug(message);
-        }
-
-        @Override
-        public void debug(Supplier<CharSequence> messageSupplier) {
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSupplier.get());
+    public EnforcerLogger enforcerLogger = TestEnforcerLoggerFactory.createTestEnforcerLogger();
+//            new EnforcerLogger() {
+//        final Log log = new SystemStreamLog();
+//
+//        @Override
+//        public void warnOrError(CharSequence message) {
+//
+//        }
+//
+//        @Override
+//        public void warnOrError(Supplier<CharSequence> messageSupplier) {
+//
+//        }
+//
+//        @Override
+//        public boolean isDebugEnabled() {
+////            return log.isDebugEnabled();
+//            return false;
+//        }
+//
+//        @Override
+//        public void debug(CharSequence message) {
+////            log.debug(message);
+//        }
+//
+//        @Override
+//        public void debug(Supplier<CharSequence> messageSupplier) {
+////            if (log.isDebugEnabled()) {
+////                log.debug(messageSupplier.get());
+////            }
+//        }
+//
+//        @Override
+//        public boolean isInfoEnabled() {
+////            return log.isInfoEnabled();
+//            return false;
+//        }
+//
+//        @Override
+//        public void info(CharSequence message) {
+//            log.info(message);
+//        }
+//
+//        @Override
+//        public void info(Supplier<CharSequence> messageSupplier) {
+//            if (log.isInfoEnabled()) {
+//                log.info(messageSupplier.get());
 //            }
-        }
-
-        @Override
-        public boolean isInfoEnabled() {
-//            return log.isInfoEnabled();
-            return false;
-        }
-
-        @Override
-        public void info(CharSequence message) {
-            log.info(message);
-        }
-
-        @Override
-        public void info(Supplier<CharSequence> messageSupplier) {
-            if (log.isInfoEnabled()) {
-                log.info(messageSupplier.get());
-            }
-        }
-
-        @Override
-        public boolean isWarnEnabled() {
-            return log.isWarnEnabled();
-        }
-
-        @Override
-        public void warn(CharSequence message) {
-            log.warn(message);
-        }
-
-        @Override
-        public void warn(Supplier<CharSequence> messageSupplier) {
-            if (log.isWarnEnabled()) {
-                log.warn(messageSupplier.get());
-            }
-        }
-
-        @Override
-        public boolean isErrorEnabled() {
-            return log.isErrorEnabled();
-        }
-
-        @Override
-        public void error(CharSequence message) {
-            log.error(message);
-        }
-
-        @Override
-        public void error(Supplier<CharSequence> messageSupplier) {
-            if (log.isErrorEnabled()) {
-                log.error(messageSupplier.get());
-            }
-        }
-    };
+//        }
+//
+//        @Override
+//        public boolean isWarnEnabled() {
+//            return log.isWarnEnabled();
+//        }
+//
+//        @Override
+//        public void warn(CharSequence message) {
+//            log.warn(message);
+//        }
+//
+//        @Override
+//        public void warn(Supplier<CharSequence> messageSupplier) {
+//            if (log.isWarnEnabled()) {
+//                log.warn(messageSupplier.get());
+//            }
+//        }
+//
+//        @Override
+//        public boolean isErrorEnabled() {
+//            return log.isErrorEnabled();
+//        }
+//
+//        @Override
+//        public void error(CharSequence message) {
+//            log.error(message);
+//        }
+//
+//        @Override
+//        public void error(Supplier<CharSequence> messageSupplier) {
+//            if (log.isErrorEnabled()) {
+//                log.error(messageSupplier.get());
+//            }
+//        }
+//    };
 
 
     @Test

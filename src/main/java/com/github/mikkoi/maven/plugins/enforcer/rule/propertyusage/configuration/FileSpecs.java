@@ -32,6 +32,8 @@ public class FileSpecs {
      * If file name is a file, get its absolute path.
      * If not, assume it is either a directory or a wildcard name, and
      * scan it with DirectoryScanner.
+     * If a file is discovered multiple times, the additional entries are discarded.
+     * This could happen, for instance, if paths withs wildcards overlap.
      *
      * @param files A Collection of Strings
      * @return A Collection of Strings
@@ -59,7 +61,9 @@ public class FileSpecs {
                     log.debug(logFileIterationMsg(fileSpec, "is a directory") + ".");
                     DirectoryScanner ds = initializeDS(Paths.get(fileSpec));
                     ds.scan();
-                    allFilenames.addAll(Arrays.stream(ds.getIncludedFiles()).map(includedFile -> new File(includedFile).getAbsolutePath()).collect(Collectors.toSet()));
+                    allFilenames.addAll(Arrays.stream(ds.getIncludedFiles())
+                            .map(includedFile -> new File(includedFile).getAbsolutePath())
+                            .collect(Collectors.toSet()));
                 } else if (file.exists()) {
                     log.error(logFileIterationMsg(fileSpec, "is not a file or directory. Do not know what to do") + "!");
                 } else {
@@ -67,7 +71,9 @@ public class FileSpecs {
                     DirectoryScanner ds = initializeDS(basedir);
                     ds.setIncludes(new String[]{fileSpec});
                     ds.scan();
-                    Collection<String> foundFiles = Arrays.stream(ds.getIncludedFiles()).map(includedFile -> Paths.get(basedir.toString(), includedFile).toString()).collect(Collectors.toSet());
+                    Collection<String> foundFiles = Arrays.stream(ds.getIncludedFiles())
+                            .map(includedFile -> Paths.get(basedir.toString(), includedFile).toAbsolutePath().toString())
+                            .collect(Collectors.toSet());
                     log.debug("    Found files:[");
                     for (final String foundFile : foundFiles) {
                         log.debug("        " + foundFile);
@@ -77,6 +83,12 @@ public class FileSpecs {
                 }
             }
         }
+//        log.debug("All discovered files: [\n" + allFilenames.stream().map(fn -> fn + "\n").sorted().collect(Collectors.toList()) + "]");
+        log.debug("All discovered files: [");
+        for (final String fn : allFilenames) {
+            log.debug("    " + fn);
+        }
+        log.debug("]");
         return allFilenames;
     }
 

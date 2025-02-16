@@ -3,7 +3,9 @@ package com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage;
 import com.github.mikkoi.maven.plugins.enforcer.rule.propertyusage.configuration.FileSpecs;
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
@@ -16,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,11 +45,32 @@ public final class PropertyUsageRuleTest {
 
     @SuppressWarnings("nullness")
     @Mock
-    private EnforcerLogger log;
+    private MavenSession session;
+
+    @SuppressWarnings("nullness")
+    @Mock
+    private RuntimeInformation runtimeInformation;
+
+//    @SuppressWarnings("nullness")
+//    @Mock
+    private EnforcerLogger log = TestEnforcerLoggerFactory.createTestEnforcerLogger();
 
     @SuppressWarnings("nullness")
     @InjectMocks
     private PropertyUsageRule rule;
+
+    @BeforeEach
+    void setup() {
+        rule.setLog(log);
+    }
+
+    private void setupProject() {
+        Properties properties = new Properties();
+        properties.setProperty("project.basedir", new File("").getAbsolutePath());
+        properties.setProperty("project.build.sourceEncoding", StandardCharsets.UTF_8.toString());
+//        when(project.getProperties()).thenReturn(properties);
+        when(project.getBasedir()).thenReturn(new File("")); // current dir
+    }
 
     private void testProps(
             // Configuration (null value => use defaults)
@@ -63,6 +87,7 @@ public final class PropertyUsageRuleTest {
             final @NonNull Collection<String> propertiesNotUsed, // These names were never used.
             final @NonNull Collection<String> propertiesNotDefined // These names were not defined.
     ) {
+//        log.info("Begin testProps()");
         // Configuration.
         if (definitionsOnlyOnce != null) {
             rule.setDefinitionsOnlyOnce(definitionsOnlyOnce);
@@ -95,24 +120,14 @@ public final class PropertyUsageRuleTest {
         } catch (EnforcerRuleException e) {
             Assertions.assertFalse(rulePasses, "Failure as expected.");
         }
+        log.debug("rule.getPropertiesNotUsed(): " + rule.getPropertiesNotUsed());
         assertTrue(!rule.isDefinedPropertiesAreUsed() || rule.getPropertiesNotUsed().equals(propertiesNotUsed), "Properties not used as expected.");
         final Set<String> resultPropertiesNodDefined = new HashSet<>();
         rule.getPropertiesNotDefined().forEach(val -> resultPropertiesNodDefined.add(val.getProperty()));
+        log.debug("rule.getPropertiesNotDefined(): " + rule.getPropertiesNotDefined());
         assertTrue(rule.isUsedPropertiesAreDefined() || resultPropertiesNodDefined.equals(propertiesNotDefined), "Properties not defined as expected.");
-        System.err.println(rule.getPropertiesDefinedMoreThanOnce());
-        Assertions.assertEquals(rule.getPropertiesDefinedMoreThanOnce().keySet(), propertiesDefinedMoreThanOnce, "Properties defined more than once as expected.");
-    }
-
-    @BeforeEach
-    void setup() {
-        rule.setLog(log);
-    }
-
-    private void setupProject() {
-        Properties properties = new Properties();
-        properties.setProperty("project.basedir", "/home/mikkoi/other/own_github/maven-enforcer-property-usage");
-        properties.setProperty("project.build.sourceEncoding", StandardCharsets.UTF_8.toString());
-        when(project.getProperties()).thenReturn(properties);
+        log.debug("rule.getPropertiesDefinedMoreThanOnce(): " + rule.getPropertiesDefinedMoreThanOnce());
+        Assertions.assertEquals(propertiesDefinedMoreThanOnce, rule.getPropertiesDefinedMoreThanOnce().keySet(), "Properties defined more than once as expected.");
     }
 
     // Implement feature first.
@@ -359,8 +374,9 @@ public final class PropertyUsageRuleTest {
         );
     }
 
+    // In this test case, we list some files twice on purpose
     @Test
-    public void testPropertyUsageRuleDefinedFail_Wildcard2() throws Exception {
+    public void testPropertyUsageRuleDefinedFail_Wildcard2_doublereadfiles() throws Exception {
         final Path tempFile = testDir.resolve("testing-file");
 //        File tempFile = testDir.newFile();
 //        assertTrue(tempFile.canWrite());
